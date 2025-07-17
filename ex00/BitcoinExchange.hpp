@@ -1,6 +1,7 @@
 #ifndef BITCOINEXCHANGE_HPP
 # define BITCOINEXCHANGE_HPP
 
+#include <ctime>
 #include <exception>
 #include <map>
 #include <string>
@@ -8,6 +9,7 @@
 class Btc {
 	public:
 		Btc( void );
+		Btc( std::string dataFilename );
 		virtual ~Btc();
 
 		Btc(const Btc &copy);
@@ -23,7 +25,8 @@ class Btc {
 	private:
 		void	open_file();
 		void	validate_file();
-		std::map<int, std::string> _m;
+		bool	parseDatabaseLine(std::string line);
+		std::map<time_t, float> _m;
 };
 
 
