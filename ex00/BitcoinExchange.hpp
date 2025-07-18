@@ -6,14 +6,14 @@
 #include <map>
 #include <string>
 
-class Btc {
+class BitcoinExchange {
 	public:
-		Btc( void );
-		Btc( std::string dataFilename );
-		virtual ~Btc();
+		BitcoinExchange( void );
+		BitcoinExchange( std::string dataFilename );
+		virtual ~BitcoinExchange();
 
-		Btc(const Btc &copy);
-		Btc& operator=( const Btc &assign );
+		BitcoinExchange(const BitcoinExchange &copy);
+		BitcoinExchange& operator=( const BitcoinExchange &assign );
 		
 		void	processInputFile(std::string filename);
 		//exceptions
@@ -22,6 +22,7 @@ class Btc {
 			public:
 				virtual const char * what() const throw();
 		};
+		void	printMapTimeFloat(void);
 	private:
 		void	open_file();
 		void	validate_file();

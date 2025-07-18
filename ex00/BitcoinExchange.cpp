@@ -5,17 +5,36 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <iostream>
 
-Btc::Btc(): _m()
+BitcoinExchange::BitcoinExchange(): _m()
 {
 }
 
-void	Btc::processInputFile(std::string filename)
+BitcoinExchange::~BitcoinExchange()
 {
-	std::ifstream fstream;
-	fstream.open(filename, std::ios_base::in);
-	if (!fstream.is_open())
-		throw std::runtime_error("Error: could not open file");
+	_m.clear();
+}
+
+// void	BitcoinExchange::processInputFile(std::string filename)
+// {
+// 	std::ifstream fstream;
+// 	fstream.open(filename, std::ios_base::in);
+// 	if (!fstream.is_open())
+// 		throw std::runtime_error("Error: could not open file");
+// }
+
+//function used to test if data.csv wa processed correctly
+//redirect output to file and do diff
+void	BitcoinExchange::printMapTimeFloat(void)
+{
+	for (std::map<time_t, float>::iterator it = _m.begin(); it != _m.end(); it++)
+	{
+		struct tm* timeInfo = localtime(&it->first);
+		char buffer[11];
+		strftime(buffer, sizeof(buffer), "%Y-%m-%d", timeInfo);
+		std::cout << buffer << "," << it->second << std::endl;
+	}
 }
 
 int parseStringToInt(const std::string& s) {
@@ -61,7 +80,7 @@ time_t	parseDatabaseDate(std::string date)
 	return (std::mktime(&time));
 }
 
-bool	Btc::parseDatabaseLine(std::string line)
+bool	BitcoinExchange::parseDatabaseLine(std::string line)
 {
 	std::string	date;
 	float		exchangeRate;
@@ -79,9 +98,9 @@ bool	Btc::parseDatabaseLine(std::string line)
 	return (true);
 }
 
-Btc::Btc(std::string dataFilename): _m()
+BitcoinExchange::BitcoinExchange(std::string dataFilename): _m()
 {
-	std::ifstream dataStream("data.csv");
+	std::ifstream dataStream(dataFilename.c_str());
 	std::string line;
 	std::string	date, value;
 

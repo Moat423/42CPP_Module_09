@@ -7,9 +7,9 @@ NAME := btc
 CXX := c++
 CXXFLAGS = -Wall -Wextra -Werror -pedantic -std=c++98
 
-HDRS := Debug.hpp Base.hpp A.hpp B.hpp C.hpp
+HDRS := Debug.hpp BitcoinExchange.hpp
 
-SRCS := main.cpp Base.cpp A.cpp B.cpp C.cpp
+SRCS := main.cpp BitcoinExchange.cpp
 
 OBJS := $(SRCS:.cpp=.o)
 
