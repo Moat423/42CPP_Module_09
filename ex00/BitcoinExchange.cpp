@@ -97,12 +97,22 @@ void	printError(std::string errortype)
 	std::cerr << "Error: " << errortype << std::endl;
 }
 
+// takes input time and input value and multiplies value by database exchange rate
 void	BitcoinExchange::writeOutput(std::tm time, float value)
 {
 	char	timeString[11];
 	float	result;
+	time_t	inputTime = (std::mktime(&time));
+	std::map<std::time_t, float>::iterator	it;
 	strftime(timeString, sizeof(timeString), "%Y-%m-%d", &time);
-	result = value * (_m.lower_bound(std::mktime(&time))->second);
+	it = _m.upper_bound(inputTime);
+	if (it == _m.begin())
+	{
+		std::cerr << "Error: no exchange rate available for " << timeString << std::endl;
+		return ;
+	}
+	--it;
+	result = value * (it->second);
 	std::cout << timeString << " => " << value << " = " << result << std::endl;
 }
 
@@ -115,6 +125,8 @@ void	BitcoinExchange::processInputFile(char *filename)
 	std::string		seperator;
 	float			value;
 
+	if (_m.empty())
+		throw std::runtime_error("No database provided.");
 	fstream.open(filename, std::ios_base::in);
 	if (!fstream.is_open())
 		throw std::runtime_error("Error: could not open file.");
