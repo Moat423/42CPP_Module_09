@@ -15,7 +15,7 @@ class BitcoinExchange {
 		BitcoinExchange(const BitcoinExchange &copy);
 		BitcoinExchange& operator=( const BitcoinExchange &assign );
 		
-		void	processInputFile(std::string filename);
+		void	processInputFile(char *filename);
 		//exceptions
 		class	notOpenException: public std::exception
 		{
@@ -26,6 +26,9 @@ class BitcoinExchange {
 	private:
 		void	open_file();
 		void	validate_file();
+		std::tm parseDate(std::string date);
+		void	writeOutput(std::tm time, float value);
+		bool	parseFileLine(std::string line);
 		bool	parseDatabaseLine(std::string line);
 		std::map<time_t, float> _m;
 };

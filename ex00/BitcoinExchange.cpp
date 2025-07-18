@@ -1,7 +1,7 @@
 #include "BitcoinExchange.hpp"
 #include <ctime>
+#include <exception>
 #include <fstream>
-#include <iterator>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -16,24 +16,16 @@ BitcoinExchange::~BitcoinExchange()
 	_m.clear();
 }
 
-// void	BitcoinExchange::processInputFile(std::string filename)
-// {
-// 	std::ifstream fstream;
-// 	fstream.open(filename, std::ios_base::in);
-// 	if (!fstream.is_open())
-// 		throw std::runtime_error("Error: could not open file");
-// }
-
-//function used to test if data.csv wa processed correctly
+//function used to test if data.csv was processed correctly
 //redirect output to file and do diff
 void	BitcoinExchange::printMapTimeFloat(void)
 {
 	for (std::map<time_t, float>::iterator it = _m.begin(); it != _m.end(); it++)
 	{
 		struct tm* timeInfo = localtime(&it->first);
-		char buffer[11];
-		strftime(buffer, sizeof(buffer), "%Y-%m-%d", timeInfo);
-		std::cout << buffer << "," << it->second << std::endl;
+		char timeString[11];
+		strftime(timeString, sizeof(timeString), "%Y-%m-%d", timeInfo);
+		std::cout << timeString << "," << it->second << std::endl;
 	}
 }
 
@@ -63,7 +55,7 @@ bool	isValidDate(int	year, int month, int day)
 }
 
 // works with date in format: 2011-01-03
-time_t	parseDatabaseDate(std::string date)
+std::tm BitcoinExchange::parseDate(std::string date)
 {
 	std::tm	time = {};
 	if (date.size() != 10 || date[4] != '-' || date[7] != '-')
@@ -77,13 +69,90 @@ time_t	parseDatabaseDate(std::string date)
 	time.tm_year = year - 1900;
 	time.tm_mon = month - 1;
 	time.tm_mday = day;
-	return (std::mktime(&time));
+	return (time);
+}
+
+bool	BitcoinExchange::parseFileLine(std::string line)
+{
+	std::string	date;
+	float		value;
+	std::tm		tmpTime;
+	time_t		key;
+	std::stringstream ss(line);
+	if (!std::getline(ss, date, ' '))
+		return (false);
+	if (!(ss >> value) || ss.fail())
+		return (false);
+	char extraGarbageAfterNumber;
+	if (ss >> extraGarbageAfterNumber)
+		return false;
+	tmpTime = parseDate(date);
+	key = std::mktime(&tmpTime);
+	this->_m[key] = value;
+	return (true);
+}
+
+void	printError(std::string errortype)
+{
+	std::cerr << "Error: " << errortype << std::endl;
+}
+
+void	BitcoinExchange::writeOutput(std::tm time, float value)
+{
+	char	timeString[11];
+	float	result;
+	strftime(timeString, sizeof(timeString), "%Y-%m-%d", &time);
+	result = value * (_m.lower_bound(std::mktime(&time))->second);
+	std::cout << timeString << " => " << value << " = " << result << std::endl;
+}
+
+void	BitcoinExchange::processInputFile(char *filename)
+{
+	std::ifstream	fstream;
+	std::string		line;
+	std::string		date;
+	std::tm			time;
+	std::string		seperator;
+	float			value;
+
+	fstream.open(filename, std::ios_base::in);
+	if (!fstream.is_open())
+		throw std::runtime_error("Error: could not open file.");
+	std::getline(fstream, line);
+	while (std::getline(fstream, line))
+	{
+		std::stringstream ss(line);
+		if (!std::getline(ss, date, ' '))
+			std::cerr << "Error: bad input => " << date << std::endl;
+		try {
+		time = parseDate(date);
+		} catch (std::exception &e) {
+			std::cerr << "Error: bad input => " << date << std::endl;
+			continue ;
+		}
+		if (!std::getline(ss >> std::ws, seperator, ' ') && seperator != "|")
+			std::cerr << "Error: bad input => " << line << std::endl;
+		if (!(ss >> value))
+			std::cerr << "Error: bad value in line => " << line << std::endl;
+		if (value < 0)
+		{
+			std::cerr << "Error: not a positive number." << std::endl;
+			continue ;
+		}
+		if (value > 1000)
+		{
+			std::cerr << "Error: too large a number." << std::endl;
+			continue ;
+		}
+		writeOutput(time, value);
+	}
 }
 
 bool	BitcoinExchange::parseDatabaseLine(std::string line)
 {
 	std::string	date;
 	float		exchangeRate;
+	std::tm		tmpTime;
 	time_t		key;
 	std::stringstream ss(line);
 	if (!std::getline(ss, date, ','))
@@ -93,7 +162,8 @@ bool	BitcoinExchange::parseDatabaseLine(std::string line)
 	char extraGarbageAfterNumber;
 	if (ss >> extraGarbageAfterNumber)
 		return false;
-	key = parseDatabaseDate(date);
+	tmpTime = parseDate(date);
+	key = std::mktime(&tmpTime);
 	this->_m[key] = exchangeRate;
 	return (true);
 }
@@ -114,4 +184,3 @@ BitcoinExchange::BitcoinExchange(std::string dataFilename): _m()
 	}
 
 }
-

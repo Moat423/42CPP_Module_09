@@ -9,9 +9,7 @@ int main (int argc, char *argv[])
 		return (1);
 	}
 	BitcoinExchange	btc("data.csv");
-	btc.printMapTimeFloat();
-	(void)argv;
-	// btc.processInputFile(argv[1]);
-
+	// btc.printMapTimeFloat();
+	btc.processInputFile(argv[1]);
 	return 0;
 }
