@@ -31,7 +31,7 @@ class PmergeMe {
 
 		PmergeMe(const PmergeMe &copy);
 		PmergeMe& operator=( const PmergeMe &assign );
-		static void	mergeInsertionSortVec( std::vector<int> vec);
+		static void	mergeInsertionSortVec( std::vector<int> &vec);
 
 	private:
 		std::vector<int> _vec;

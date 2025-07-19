@@ -1,6 +1,7 @@
 #include "PmergeMe.hpp"
 #include "Debug.hpp"
 #include "string"
+#include <vector>
 
 // Default Constructor
 PmergeMe::PmergeMe( void )
@@ -31,8 +32,20 @@ PmergeMe& PmergeMe::operator=( const PmergeMe &assign )
 {
 	if (this != &assign)
 	{
-		
+		//nothing
 	}
 	return *this;
 }
 
+void	PmergeMe::mergeInsertionSortVec( std::vector<int> &vec)
+{
+	while (/*largeElements.size > 2 */)
+	{
+	//pair up
+	//sort in pair (small in front, create lookup table,)
+	//vec of largerElements
+	}
+	//pair up
+	//sort in pair (small in front)
+	//mergeInsert
+}
