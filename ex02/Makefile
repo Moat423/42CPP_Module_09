@@ -3,13 +3,13 @@ SHELL := /bin/bash
 MAKEFILES :=
 MAKEFLAGS += --no-print-directory --warn-undefined-variables
 
-NAME := a.out
+NAME := PmergeMe
 CXX := c++
 CXXFLAGS = -Wall -Wextra -Werror -pedantic -std=c++98
 
-HDRS := Debug.hpp Base.hpp A.hpp B.hpp C.hpp
+HDRS := Debug.hpp PmergeMe.hpp
 
-SRCS := main.cpp Base.cpp A.cpp B.cpp C.cpp
+SRCS := main.cpp PmergeMe.cpp
 
 OBJS := $(SRCS:.cpp=.o)
 
