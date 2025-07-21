@@ -31,9 +31,10 @@ class PmergeMe {
 
 		PmergeMe(const PmergeMe &copy);
 		PmergeMe& operator=( const PmergeMe &assign );
-		static void	mergeInsertionSortVec( std::vector<int> &vec);
+		void	mergeInsertionSortVec( std::vector<int> &vec);
 
 	private:
+		std::vector<int>	generateJacobsthalNumbers(size_t n);
 		std::vector<int> _vec;
 		std::deque<int> _deq;
 };

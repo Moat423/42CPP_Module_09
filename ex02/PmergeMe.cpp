@@ -34,11 +34,20 @@ PmergeMe& PmergeMe::operator=( const PmergeMe &assign )
 	{
 		//nothing
 	}
-	return *this;
+	return (*this);
 }
 
 void	PmergeMe::mergeInsertionSortVec( std::vector<int> &vec)
 {
+	if (vec.size() <= 1)
+		return ;
+	int		straggler = -1;
+	bool	hasStraggler = vec.size() % 2 != 0;
+	if (hasStraggler)
+	{
+		straggler = vec.back();
+		vec.pop_back();
+	}
 	while (/*largeElements.size > 2 */)
 	{
 	//pair up

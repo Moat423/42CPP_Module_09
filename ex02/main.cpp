@@ -35,5 +35,7 @@ int main (int argc, char *argv[])
 	std::cout << YEL << "Before: " << RESET;
 	printContainer(vec);
 	// stopwatch(PmergeMe::mergeInsertionSortVec, vec);
+	std::cout << YEL << "Aafter: " << RESET;
+	printContainer(vec);
 	return 0;
 }
