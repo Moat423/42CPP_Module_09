@@ -48,9 +48,40 @@ RPN& RPN::operator=( const RPN &assign )
 	return (*this);
 }
 
+int RPN::operation( int left, int right, int current )
+{
+	switch (current) {
+		case ('+'):
+			return (left + right);
+		case ('-'):
+			return (left - right);
+		case ('*'):
+			return (left * right);
+		case ('/'):
+			return (left / right);
+		default:
+			throw invalidRPNExpressionException();
+	}
+}
+
 void RPN::calculate( void )
 {
+	int	result;
+	int	right;
+	int	left;
 
+	while (!_stack.empty())
+	{
+		int	current = _stack.top();
+		if (current == '+' || current == '-' || current == '*' || current == '/')
+		{
+			_stack.pop();
+			left = _stack.top();
+			_stack.pop();
+			right = _stack.top();
+			operation(left, right, static_cast<char>(current));
+		}
+	}
 }
 
 void RPN::print( void ) const

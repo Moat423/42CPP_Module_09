@@ -1,6 +1,7 @@
 #ifndef RPN_HPP
 # define RPN_HPP
 
+#include <exception>
 #include <stack>
 class RPN {
 	public:
@@ -11,9 +12,14 @@ class RPN {
 		RPN& operator=( const RPN &assign );
 		void calculate( void );
 		void print( void ) const;
+		class invalidRPNExpressionException: public std::exception
+		{
+
+		};
 
 	private:
 		RPN( void );
+		int operation( int left, int right, int current );
 		std::stack<int>	_stack;
 };
 
