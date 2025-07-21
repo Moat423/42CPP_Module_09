@@ -11,9 +11,9 @@ class RPN {
 		virtual ~RPN();
 
 		RPN(const RPN &copy);
-		RPN& operator=( const RPN &assign );
-		void calculate( std::string input );
-		void print( void ) const;
+		RPN&	operator=( const RPN &assign );
+		void	calculate( std::string input );
+		void	print( void ) const;
 		class InsufficientOperandsException: public std::exception
 	  	{
 			const char * what() const throw();
@@ -27,8 +27,8 @@ class RPN {
 			const char * what() const throw();
 		};
 	private:
-		int operation( int left, int right, int current );
-		void operationOnStack( char operand );
+		int		operation( int left, int right, int current );
+		void	operationOnStack( char operand );
 
 		std::stack<int>	_stack;
 };

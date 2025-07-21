@@ -80,10 +80,7 @@ void RPN::calculate( std::string input )
 			throw std::runtime_error("Invalid token in input: " + std::string(1, token[0]));
 	}
 	if (_stack.size() != 1)
-	{
-		print();
 		throw ExcessOperandsException();
-	}
 	std::cout << _stack.top() << std::endl;
 	return ;
 }
