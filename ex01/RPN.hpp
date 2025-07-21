@@ -3,23 +3,33 @@
 
 #include <exception>
 #include <stack>
+#include <string>
+
 class RPN {
 	public:
-		RPN( char * input );
+		RPN( void );
 		virtual ~RPN();
 
 		RPN(const RPN &copy);
 		RPN& operator=( const RPN &assign );
-		void calculate( void );
+		void calculate( std::string input );
 		void print( void ) const;
-		class invalidRPNExpressionException: public std::exception
-		{
-
+		class InsufficientOperandsException: public std::exception
+	  	{
+			const char * what() const throw();
 		};
-
+		class ExcessOperandsException: public std::exception
+	  	{
+			const char * what() const throw();
+		};
+		class InvalidTokenException: public std::exception
+	  	{
+			const char * what() const throw();
+		};
 	private:
-		RPN( void );
 		int operation( int left, int right, int current );
+		void operationOnStack( char operand );
+
 		std::stack<int>	_stack;
 };
 

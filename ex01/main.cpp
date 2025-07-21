@@ -8,9 +8,10 @@ int main (int argc, char *argv[]) {
 		return 1;
 	}
 	try {
-	RPN rpn(argv[1]);
-	// rpn.calculate();
-	rpn.print();
+	// RPN rpn(argv[1]);
+	RPN rpn;
+	rpn.calculate(std::string(argv[1]));
+	// rpn.print();
 	} catch (std::exception &e) {
 		std::cerr << "Error: " << e.what() << std::endl;
 		return 1;
