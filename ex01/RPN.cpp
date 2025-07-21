@@ -11,7 +11,21 @@ RPN::RPN( void )
 // Parameterized Constructor
 RPN::RPN( char * input)
 {
-	debug("RPN Parameterized Constructor called with value: " + input);
+	debug("RPN Parameterized Constructor called with value: ");
+	debug(input);
+	for (int i = 0; input[i] != '\0'; ++i)
+	{
+		if (isdigit(input[i]))
+			_stack.push(input[i++] - '0');
+		else if (input[i] == '+' || input[i] == '-' || input[i] == '*' || input[i] == '/')
+			_stack.push(input[i++]);
+		if (input[i] == ' ')
+			continue;
+		if (!input[i])
+			return ;
+		throw std::runtime_error("Invalid character in input: " + std::string(1, input[i]));
+		return ;
+	}
 }
 
 // Destructor
@@ -24,7 +38,6 @@ RPN::~RPN()
 RPN::RPN(const RPN &copy): _stack(copy._stack)
 {
 	debug("RPN Copy Constructor called");
-	debug("Copyied stack size: " + std::to_string(_stack.size()));
 }
 
 // Copy Assignment Operator
@@ -43,11 +56,17 @@ void RPN::calculate( void )
 void RPN::print( void ) const
 {
 	std::stack<int> tmp(_stack);
-	while (!tmp.empty())
+	while (tmp.size() > 1)
 	{
-		std::cout << tmp.top();
+		int	current = tmp.top();
+		if (current >= 42 && current <= 47)
+			std::cout << static_cast<char>(current);
+		else
+			std::cout << current;
 		tmp.pop();
-		if (!tmp.empty())
-			std::cout << " ";
+		std::cout << " ";
 	}
+	std::cout << tmp.top();
+	tmp.pop();
+	std::cout << std::endl;
 }
