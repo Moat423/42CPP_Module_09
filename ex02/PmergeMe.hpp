@@ -34,6 +34,15 @@ class PmergeMe {
 		void	mergeInsertionSortVec( std::vector<int> &vec);
 
 	private:
+		// typedef struct Element
+		// {
+		// 	int	large;
+		// 	int	originalIndex;
+		// } Element;
+		std::vector<int>	sortInPair( std::vector<int> &vec );
+		std::vector<int>	vectorFromEverySecond( const std::vector<int> vec , int n);
+		std::vector<int>	FordJohnsonSort( std::vector<int> &vec );
+		std::vector<int>	pair( std::vector<int> &vec );
 		std::vector<int>	generateJacobsthalNumbers(size_t n);
 		std::vector<int> _vec;
 		std::deque<int> _deq;
