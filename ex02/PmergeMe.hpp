@@ -36,7 +36,7 @@ class PmergeMe {
 
 		PmergeMe(const PmergeMe &copy);
 		PmergeMe& operator=( const PmergeMe &assign );
-		void	mergeInsertionSortVec( std::vector<int> &vec);
+		static void	mergeInsertionSortVec( std::vector<int> &vec);
 
 		static size_t	comparisonCount;
 	private:
@@ -47,17 +47,17 @@ class PmergeMe {
 			int	previousIndex;
 			bool operator<( const ElementInfo &other ) const;
 		} ElementInfo;
-		std::vector<PmergeMe::ElementInfo>	sortInPair( std::vector<ElementInfo> &vec );
-		std::vector<int>	vectorFromEverySecond( const std::vector<int> vec , int n);
-		PmergeMe::ElementInfo	IntToElementInfo(int value, int index);
-		std::vector<PmergeMe::ElementInfo>	vectorFromEverySecondElement( const std::vector<ElementInfo> vec , int n);
-		std::vector<PmergeMe::ElementInfo>	FordJohnsonSort( std::vector<ElementInfo> &vec );
-		PmergeMe::ElementInfo	getElementFromTableForPrevious(int index, const std::vector<ElementInfo> table);
-		std::vector<PmergeMe::ElementInfo>	buildChain( const std::vector<ElementInfo> &largeElements );
-		std::vector<int>	FordJohnsonSort( std::vector<int> &vec );
-		std::vector<int>	pair( std::vector<int> &vec );
-		std::vector<size_t>	generateJacobsthalNumbers(size_t n);
-		void	insertElementsByGroups(std::vector<ElementInfo>& mainChain, const std::vector<ElementInfo>& pendChain);
+		static std::vector<PmergeMe::ElementInfo>	sortInPair( std::vector<ElementInfo> &vec );
+		static std::vector<int>	vectorFromEverySecond( const std::vector<int> vec , int n);
+		static PmergeMe::ElementInfo	IntToElementInfo(int value, int index);
+		static std::vector<PmergeMe::ElementInfo>	vectorFromEverySecondElement( const std::vector<ElementInfo> vec , int n);
+		static std::vector<PmergeMe::ElementInfo>	FordJohnsonSort( std::vector<ElementInfo> &vec );
+		static PmergeMe::ElementInfo	getElementFromTableForPrevious(int index, const std::vector<ElementInfo> table);
+		static std::vector<PmergeMe::ElementInfo>	buildChain( const std::vector<ElementInfo> &largeElements );
+		static std::vector<int>	FordJohnsonSort( std::vector<int> &vec );
+		static std::vector<int>	pair( std::vector<int> &vec );
+		static std::vector<size_t>	generateJacobsthalNumbers(size_t n);
+		static void	insertElementsByGroups(std::vector<ElementInfo>& mainChain, const std::vector<ElementInfo>& pendChain);
 };
 
 
