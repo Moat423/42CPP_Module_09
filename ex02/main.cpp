@@ -2,6 +2,7 @@
 #include <iostream>
 #include "PmergeMe.hpp"
 #include <limits>
+#include <vector>
 #include "Debug.hpp"
 
 int main (int argc, char *argv[])
@@ -33,6 +34,9 @@ int main (int argc, char *argv[])
 	}
 	std::cout << YEL << "Before: " << RESET;
 	printContainer(vec);
+	PmergeMe pm;
+	std::vector<int> inderstionOrder = pm.generateInsertionSequence(7);
+	printContainer(inderstionOrder);
 	// stopwatch(PmergeMe::mergeInsertionSortVec, vec);
 	std::cout << YEL << "Aafter: " << RESET;
 	printContainer(vec);

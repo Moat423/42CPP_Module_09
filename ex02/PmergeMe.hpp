@@ -32,7 +32,8 @@ class PmergeMe {
 		PmergeMe(const PmergeMe &copy);
 		PmergeMe& operator=( const PmergeMe &assign );
 		void	mergeInsertionSortVec( std::vector<int> &vec);
-
+// move to private later
+		std::vector<int>	generateInsertionSequence(size_t n);
 	private:
 		typedef struct ElementInfo
 		{
