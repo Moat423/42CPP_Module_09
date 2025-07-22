@@ -4,6 +4,8 @@
 #include <stdexcept>
 #include <vector>
 
+size_t PmergeMe::comparisonCount = 0;
+
 // Default Constructor
 PmergeMe::PmergeMe( void )
 {
@@ -42,18 +44,15 @@ PmergeMe& PmergeMe::operator=( const PmergeMe &assign )
 std::vector<PmergeMe::ElementInfo>	PmergeMe::sortInPair( std::vector<ElementInfo> &vec )
 {
 	std::vector<ElementInfo> originalPositions;
-	for (size_t i = 1; i < vec.size(); i += 2)
+	for (size_t i = 0; i < vec.size() - 1; i += 2)
 	{
-		if (vec[i] < vec [i - 1])
-		{
-			std::swap(vec[i], vec[i - 1]);
-			originalPositions.push_back(vec[i + 1]);
-			originalPositions.push_back(vec[i]);
-			continue;
-		}
+		if (vec[i] < vec [i + 1])
+			std::swap(vec[i], vec[i + 1]);
 		originalPositions.push_back(vec[i]);
 		originalPositions.push_back(vec[i + 1]);
 	}
+	if (vec.size() % 2 != 0)
+			originalPositions.push_back(vec[vec.size() - 1]);
 	if (originalPositions.size() != vec.size())
 		throw std::logic_error("originalPositions and vec size in sort in pair not same");
 	return (originalPositions);
@@ -62,7 +61,7 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::sortInPair( std::vector<ElementInfo
 // takes either every (i*2 -n)th elemement
 std::vector<int>	PmergeMe::vectorFromEverySecond( const std::vector<int> vec , int n)
 {
-	if (n == 0 || n == 1)
+	if (n != 0 && n != 1)
 		return (std::vector<int>());
 	std::vector<int>	Elements;
 	for (size_t i = n; i < vec.size(); i += 2)
@@ -73,9 +72,10 @@ std::vector<int>	PmergeMe::vectorFromEverySecond( const std::vector<int> vec , i
 // takes either every (i*2 -n)th elemement
 std::vector<PmergeMe::ElementInfo>	PmergeMe::vectorFromEverySecondElement( const std::vector<ElementInfo> vec , int n)
 {
-	if (n == 0 || n == 1)
+	if (n != 0 && n != 1)
 		return (std::vector<ElementInfo>());
 	std::vector<ElementInfo>	Elements;
+	Elements.reserve(vec.size() / 2);
 	for (size_t i = n; i < vec.size(); i += 2)
 		Elements.push_back(vec[i]);
 	return (Elements);
@@ -124,6 +124,8 @@ void	PmergeMe::insertElementsByGroups(std::vector<ElementInfo>& mainChain, const
     if (pendChain.empty()) return;
     // Always insert the first element at position 0
     mainChain.insert(mainChain.begin(), pendChain[0]);
+	if (mainChain.size() == 2)
+		return ;
     // Keep track of position adjustments as we insert elements
     std::vector<size_t> largeElementPositions(pendChain.size());
     for (size_t i = 0; i < pendChain.size(); ++i) {
@@ -179,6 +181,7 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::FordJohnsonSort( std::vector<Elemen
 	}
 	std::vector<ElementInfo>			originalPositions = sortInPair(vec);
 	std::vector<ElementInfo>	pairTable;
+	pairTable.reserve(vec.size());
 	int							pairIndex = 0;
 	for (size_t i = 0; i + 1 < originalPositions.size(); i += 2) {
 		ElementInfo e1 = { originalPositions[i].value,  pairIndex, originalPositions[i].originalIndex };
@@ -195,7 +198,7 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::FordJohnsonSort( std::vector<Elemen
 	std::vector<ElementInfo> smallElements = vectorFromEverySecondElement(pairTable, 1);
 	std::vector<ElementInfo> largeElements = vectorFromEverySecondElement(pairTable, 0);
 	std::vector<ElementInfo> indexLookup = FordJohnsonSort( largeElements );
-	std::vector<ElementInfo> mainChain = buildChain( largeElements );
+	std::vector<ElementInfo> mainChain = buildChain( indexLookup );
 	std::vector<ElementInfo> pendChain = buildChain( smallElements );
 	// generate insertion sequece
 	// use insertion sequence to insert the current interstion seuence elements smallElement from the large Elements list into mainChain with binary search, with end = current jacob sequence element + 2 (i believe that to be the correct bound but should it up again)
@@ -208,41 +211,28 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::FordJohnsonSort( std::vector<Elemen
 	return (mainChain);
 }
 
-PmergeMe::ElementInfo	PmergeMe::IntToElementInfo(int value, int index)
-{
-	ElementInfo e = {value, index, index};
-	return (e);
-}
-
 void	PmergeMe::mergeInsertionSortVec( std::vector<int> &vec)
 {
 	if (vec.size() <= 1)
 		return ;
 	std::vector<ElementInfo> vecOfEl;
 	for (size_t i = 0; i < vec.size(); i++)
-		vecOfEl.push_back(IntToElementInfo(vec[i], i));
+	{
+        ElementInfo e = {vec[i], static_cast<int>(i), static_cast<int>(i)};
+		vecOfEl.push_back(e);
+	}
 	std::vector<ElementInfo> sortedElements = FordJohnsonSort( vecOfEl );
 	vec.clear();
-	for (std::vector<int>::reverse_iterator it = vec.rend(); it + 1 != vec.rbegin(); it++)
+	for (size_t i = 0; i < sortedElements.size(); ++i)
 	{
-		vec.push_back(sortedElements.back().value);
-		sortedElements.pop_back();
+		vec.push_back(sortedElements[i].value);
 	}
 }
 
 /* ====================ElementInfo Operators==================== */
 
-bool PmergeMe::ElementInfo::operator==( const ElementInfo &other ) const
-{
-	return (this->value == other.value);
-}
-
-bool PmergeMe::ElementInfo::operator>( const ElementInfo &other ) const
-{
-	return (this->value > other.value);
-}
-
 bool PmergeMe::ElementInfo::operator<( const ElementInfo &other ) const
 {
+	PmergeMe::comparisonCount++;
 	return (this->value < other.value);
 }
