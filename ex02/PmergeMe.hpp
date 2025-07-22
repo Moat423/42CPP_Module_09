@@ -34,18 +34,27 @@ class PmergeMe {
 		void	mergeInsertionSortVec( std::vector<int> &vec);
 
 	private:
-		// typedef struct Element
-		// {
-		// 	int	large;
-		// 	int	originalIndex;
-		// } Element;
-		std::vector<int>	sortInPair( std::vector<int> &vec );
+		typedef struct ElementInfo
+		{
+			int	value;
+			int	originalIndex;
+			int	previousIndex;
+			bool operator==( const ElementInfo &other ) const;
+			bool operator>( const ElementInfo &other ) const;
+			bool operator<( const ElementInfo &other ) const;
+		} ElementInfo;
+		// std::vector<int>	sortInPair( std::vector<int> &vec );
+		std::vector<PmergeMe::ElementInfo>	sortInPair( std::vector<ElementInfo> &vec );
 		std::vector<int>	vectorFromEverySecond( const std::vector<int> vec , int n);
+		std::vector<PmergeMe::ElementInfo>	vectorFromEverySecondElement( const std::vector<ElementInfo> vec , int n);
+		std::vector<PmergeMe::ElementInfo>	FordJohnsonSort( std::vector<ElementInfo> &vec );
+		PmergeMe::ElementInfo	getElementFromTableForPrevious(int index, const std::vector<ElementInfo> table);
+		std::vector<PmergeMe::ElementInfo>	buildChain( const std::vector<ElementInfo> &largeElements );
 		std::vector<int>	FordJohnsonSort( std::vector<int> &vec );
 		std::vector<int>	pair( std::vector<int> &vec );
 		std::vector<int>	generateJacobsthalNumbers(size_t n);
-		std::vector<int> _vec;
-		std::deque<int> _deq;
+		// std::vector<int>	_vec;
+		// std::deque<int>		_deq;
 };
 
 

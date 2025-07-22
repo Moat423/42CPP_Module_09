@@ -1,2 +1,8 @@
 # Ford-Johnsen Algorithm or the Merge-Insertion Algorithm
-also: the algorithm with the least amount of comparisons.
+
+also: the algorithm that approaches the least amount of comparisons theoretically needed to sort a list of n elements.
+For under eleven Elements, it has the best worse case performance for the amount of comparisons needed to sort a list of n elements.
+For this ford johnson algorithm, i would like to create a lookup table in every recursion table.
+
+basically, I will pair, create a table, assign an index to each pair and then separate the large elements from that table and attribute them with the index, so that when i give them into the next deeper level of pairing as an input, the lookup table created at that point will contain elements paired with an index. these are paired with the new index and from that table i extract the large elements and attribute them with the new index from the current table. that way, at each depth level, there is a table, from which i will then be able to build the main chain back up again, containing information from the previous depth level, so that i can look up the correct elements there. That means, once the pairing is all done, it will return and merge. the merging will use the index table at that step, to create a main chain that is ready for insertion from the vector that was returned in pairing. it will look up the larger element at the index in the order of the returned vec from pairing and then copy that element into a new main chain. this element will contain information for it's value, as well as it's index for the previous recursion level, which is not yet relevant. But the insertion will take place with elements from the table. then this function will return and return it's modified vector to the previous depth level and so on.
+

@@ -2,7 +2,6 @@
 #include <iostream>
 #include "PmergeMe.hpp"
 #include <limits>
-#include <string>
 #include "Debug.hpp"
 
 int main (int argc, char *argv[])
