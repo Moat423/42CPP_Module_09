@@ -37,9 +37,10 @@ int main (int argc, char *argv[])
 	PmergeMe pm;
 	// std::vector<int> inderstionOrder = pm.generateInsertionSequence(7);
 	// printContainer(inderstionOrder);
-	pm.mergeInsertionSortVec(vec);
 	// stopwatch(pm.mergeInsertionSortVec, vec);
+	pm.mergeInsertionSortVec(vec);
 	std::cout << YEL << "After: " << RESET;
 	printContainer(vec);
+	std::cout << "comparison count: " << PmergeMe::comparisonCount << std::endl;
 	return 0;
 }

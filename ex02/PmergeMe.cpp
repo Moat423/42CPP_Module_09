@@ -90,12 +90,12 @@ PmergeMe::ElementInfo	PmergeMe::getElementFromTableForPrevious(int index, const 
 // build chain from elements, to
 // make a duplicate of largeElements or smallElements, but with previousIndex set to -1 and original
 // index to what was prevIndex in largeElements
-std::vector<PmergeMe::ElementInfo>	PmergeMe::buildChain( const std::vector<ElementInfo> &ElementsList )
+std::vector<PmergeMe::ElementInfo>	PmergeMe::buildChain( const std::vector<ElementInfo> &elementsList )
 {
 	std::vector<ElementInfo>	chain;
-	for (size_t i = 0; i < ElementsList.size(); i++)
+	for (size_t i = 0; i < elementsList.size(); i++)
 	{
-		ElementInfo e = { ElementsList[i].value, ElementsList[i].originalIndex, -1 };
+		ElementInfo e = { elementsList[i].value, elementsList[i].originalIndex, -1 };
 		chain.push_back(e);
 	}
 	return (chain);
@@ -169,7 +169,7 @@ void	PmergeMe::insertElementsByGroups(std::vector<ElementInfo>& mainChain, const
 std::vector<PmergeMe::ElementInfo>	PmergeMe::FordJohnsonSort( std::vector<ElementInfo> &vec )
 {
 	if (vec.size() <= 1)
-		return (std::vector<ElementInfo>());
+		return (vec);
 	ElementInfo		straggler;
 	bool	hasStraggler = vec.size() % 2 != 0;
 	if (hasStraggler)
@@ -221,43 +221,12 @@ void	PmergeMe::mergeInsertionSortVec( std::vector<int> &vec)
 	std::vector<ElementInfo> vecOfEl;
 	for (size_t i = 0; i < vec.size(); i++)
 		vecOfEl.push_back(IntToElementInfo(vec[i], i));
-	ElementInfo		straggler;
-	bool	hasStraggler = vec.size() % 2 != 0;
-	if (hasStraggler)
-	{
-		straggler = vecOfEl.back();
-		vecOfEl.pop_back();
-	}
-	std::vector<ElementInfo>			originalPositions = sortInPair(vecOfEl);
-	std::vector<ElementInfo>	pairTable;
-	int							pairIndex = 0;
-	for (size_t i = 0; i + 1 < originalPositions.size(); i += 2) {
-		ElementInfo e1 = { originalPositions[i].value,  pairIndex, originalPositions[i].originalIndex };
-		ElementInfo e2 = { originalPositions[i+1].value,  pairIndex, originalPositions[i+1].originalIndex };
-		pairTable.push_back(e1);
-		pairTable.push_back(e2);
-		pairIndex++;
-	}
-	// if (hasStraggler)
-	// {
-	// 	ElementInfo e = { straggler.value, -1, straggler.originalIndex };
-	// 	pairTable.push_back(e);
-	// }
-	std::vector<ElementInfo> smallElements = vectorFromEverySecondElement(pairTable, 1);
-	std::vector<ElementInfo> largeElements = vectorFromEverySecondElement(pairTable, 0);
-	std::vector<ElementInfo> indexLookup = FordJohnsonSort( largeElements );
-	std::vector<ElementInfo> mainChain = buildChain( largeElements );
-	std::vector<ElementInfo> pendChain = buildChain( smallElements );
-    if (hasStraggler) {
-        std::vector<ElementInfo>::iterator it = std::lower_bound(
-            mainChain.begin(), mainChain.end(), straggler);
-        mainChain.insert(it, straggler);
-    }
+	std::vector<ElementInfo> sortedElements = FordJohnsonSort( vecOfEl );
 	vec.clear();
 	for (std::vector<int>::reverse_iterator it = vec.rend(); it + 1 != vec.rbegin(); it++)
 	{
-		vec.push_back(mainChain.back().value);
-		mainChain.pop_back();
+		vec.push_back(sortedElements.back().value);
+		sortedElements.pop_back();
 	}
 }
 
