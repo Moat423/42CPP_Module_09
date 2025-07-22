@@ -19,3 +19,8 @@ starting from index 3 of jabobssequence, decrease number by one to get index
 and add inbetween missing numbers while (number - 1 > (current index in modified jacobs sequence - 1))
 (for n - 1)
 
+
+I am thinking, that using a vector and this convoluted lookup table is just making it much more complex right. now. let's go with a list instead.
+the list will have its value and a pointer to its smaller pair. The overload for the comparison operators you don't have to write. I can do that.
+There will be a largeElement list that i won't modify unlike the main
+if we have a pointer, then in the insertion stage, we instantly know the lower_bound.

@@ -18,6 +18,8 @@ template<typename Container>
 void	printContainer(Container container)
 {
 	typename Container::iterator it = container.begin();
+	if (container.size() == 0)
+		return ;
 	while (it != container.end() - 1)
 		std::cout << *it++ << " ";
 	std::cout << *it << std::endl;
@@ -33,7 +35,7 @@ class PmergeMe {
 		PmergeMe& operator=( const PmergeMe &assign );
 		void	mergeInsertionSortVec( std::vector<int> &vec);
 // move to private later
-		std::vector<int>	generateInsertionSequence(size_t n);
+		std::vector<size_t>	generateInsertionSequence(size_t n);
 	private:
 		typedef struct ElementInfo
 		{
@@ -47,13 +49,15 @@ class PmergeMe {
 		// std::vector<int>	sortInPair( std::vector<int> &vec );
 		std::vector<PmergeMe::ElementInfo>	sortInPair( std::vector<ElementInfo> &vec );
 		std::vector<int>	vectorFromEverySecond( const std::vector<int> vec , int n);
+		PmergeMe::ElementInfo	IntToElementInfo(int value, int index);
 		std::vector<PmergeMe::ElementInfo>	vectorFromEverySecondElement( const std::vector<ElementInfo> vec , int n);
 		std::vector<PmergeMe::ElementInfo>	FordJohnsonSort( std::vector<ElementInfo> &vec );
 		PmergeMe::ElementInfo	getElementFromTableForPrevious(int index, const std::vector<ElementInfo> table);
 		std::vector<PmergeMe::ElementInfo>	buildChain( const std::vector<ElementInfo> &largeElements );
 		std::vector<int>	FordJohnsonSort( std::vector<int> &vec );
 		std::vector<int>	pair( std::vector<int> &vec );
-		std::vector<int>	generateJacobsthalNumbers(size_t n);
+		std::vector<size_t>	generateJacobsthalNumbers(size_t n);
+		void	insertElementsByGroups(std::vector<ElementInfo>& mainChain, const std::vector<ElementInfo>& pendChain);
 		// std::vector<int>	_vec;
 		// std::deque<int>		_deq;
 };

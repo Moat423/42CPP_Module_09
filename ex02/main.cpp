@@ -35,10 +35,11 @@ int main (int argc, char *argv[])
 	std::cout << YEL << "Before: " << RESET;
 	printContainer(vec);
 	PmergeMe pm;
-	std::vector<int> inderstionOrder = pm.generateInsertionSequence(7);
-	printContainer(inderstionOrder);
-	// stopwatch(PmergeMe::mergeInsertionSortVec, vec);
-	std::cout << YEL << "Aafter: " << RESET;
+	// std::vector<int> inderstionOrder = pm.generateInsertionSequence(7);
+	// printContainer(inderstionOrder);
+	pm.mergeInsertionSortVec(vec);
+	// stopwatch(pm.mergeInsertionSortVec, vec);
+	std::cout << YEL << "After: " << RESET;
 	printContainer(vec);
 	return 0;
 }

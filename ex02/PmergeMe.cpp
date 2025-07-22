@@ -62,7 +62,7 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::sortInPair( std::vector<ElementInfo
 // takes either every (i*2 -n)th elemement
 std::vector<int>	PmergeMe::vectorFromEverySecond( const std::vector<int> vec , int n)
 {
-	if (n != 0 || n != 1)
+	if (n == 0 || n == 1)
 		return (std::vector<int>());
 	std::vector<int>	Elements;
 	for (size_t i = n; i < vec.size(); i += 2)
@@ -73,7 +73,7 @@ std::vector<int>	PmergeMe::vectorFromEverySecond( const std::vector<int> vec , i
 // takes either every (i*2 -n)th elemement
 std::vector<PmergeMe::ElementInfo>	PmergeMe::vectorFromEverySecondElement( const std::vector<ElementInfo> vec , int n)
 {
-	if (n != 0 || n != 1)
+	if (n == 0 || n == 1)
 		return (std::vector<ElementInfo>());
 	std::vector<ElementInfo>	Elements;
 	for (size_t i = n; i < vec.size(); i += 2)
@@ -101,9 +101,9 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::buildChain( const std::vector<Eleme
 	return (chain);
 }
 
-std::vector<int>	PmergeMe::generateJacobsthalNumbers(size_t n)
+std::vector<size_t>	PmergeMe::generateJacobsthalNumbers(size_t n)
 {
-	std::vector<int>	sequence;
+	std::vector<size_t>	sequence;
 
 	sequence.push_back(0);
 	sequence.push_back(1);
@@ -115,52 +115,55 @@ std::vector<int>	PmergeMe::generateJacobsthalNumbers(size_t n)
 	return (sequence);
 }
 
-std::vector<int>	PmergeMe::generateInsertionSequence(size_t n)
-{
-	std::vector<int>	sequence;
-	if (n == 0)
-		return (sequence);
-	sequence.push_back(0);
-	if (n == 1)
-		return (sequence);
-	std::vector<int>	jacobsthal = generateJacobsthalNumbers(n);
-	size_t	j;
-	int		next;
-	int		jabobsIndex = 2;
-	int		sequenceIndex = 0;
-	while (jacobsthal[jabobsIndex] + 1 < n)
-	{
-		if (jacobsthal[jabobsIndex] != jacobsthal[jabobsIndex - 1] + 1)
-		{
-			j = sequenceIndex;
-			while (jacobsthal[jabobsIndex - 1] - 1 != sequence[j] + 1)
-			{
-				next = sequence[j] - 1;
-				j++;
-			}
-		}
-		else
-			next = jacobsthal[jabobsIndex] - 1;
-		sequence.push_back(next);
-		jabobsIndex++;
-		sequenceIndex++;
-	}
-	for (size_t i = 3; i < n - 3; i++)
-	{
-		if (jacobsthal[i] != jacobsthal[i - 1] + 1)
-		{
-			j = i;
-			while (jacobsthal[i - 1] - 1 != sequence[j] + 1)
-			{
-				next = sequence[j] - 1;
-			}
-		}
-		else
-			next = jacobsthal[i] - 1;
-		sequence.push_back(next);
+size_t getGroupSize(size_t n) {
+    if (n <= 2) return 2;
+    return (1U << (n-2)) + getGroupSize(n-2);
+}
 
-	}
-	return (sequence);
+void	PmergeMe::insertElementsByGroups(std::vector<ElementInfo>& mainChain, const std::vector<ElementInfo>& pendChain) {
+    if (pendChain.empty()) return;
+    // Always insert the first element at position 0
+    mainChain.insert(mainChain.begin(), pendChain[0]);
+    // Keep track of position adjustments as we insert elements
+    std::vector<size_t> largeElementPositions(pendChain.size());
+    for (size_t i = 0; i < pendChain.size(); ++i) {
+        // Find position of corresponding large element
+        size_t largeElemPos = i + 1; // +1 because we inserted the first element
+        largeElementPositions[i] = largeElemPos;
+    }
+    // Process remaining elements in groups
+    size_t groupNumber = 1; // Start with the first group
+    size_t elementIndex = 1; // Skip the first element (already inserted)
+    while (elementIndex < pendChain.size()) {
+        // Calculate current group size
+        size_t groupSize = (groupNumber <= 2) ? 2 : (1U << (groupNumber-2)) + getGroupSize(groupNumber-2);
+        // Ensure we don't go beyond the array bounds
+        groupSize = std::min(groupSize, pendChain.size() - elementIndex);
+        // Process current group (from highest index to lowest)
+        size_t endOfGroup = elementIndex + groupSize;
+        for (size_t i = endOfGroup - 1; i >= elementIndex; --i) {
+            // Get the element to insert
+            const ElementInfo& elemToInsert = pendChain[i];
+            // Find the position of its paired larger element
+            size_t upperBound = largeElementPositions[i];
+            // Binary search with optimized bound
+            std::vector<ElementInfo>::iterator insertPos = std::lower_bound(
+                mainChain.begin(), mainChain.begin() + upperBound,
+                elemToInsert);
+            size_t insertIdx = insertPos - mainChain.begin();
+            // Insert the element
+            mainChain.insert(insertPos, elemToInsert);
+            // Update position tracking for all elements after the insertion point
+            for (size_t j = 0; j < pendChain.size(); ++j) {
+                if (largeElementPositions[j] >= insertIdx) {
+                    largeElementPositions[j]++;
+                }
+            }
+            if (i == elementIndex) break; // Prevent underflow in unsigned counter
+        }
+        elementIndex += groupSize;
+        groupNumber++;
+    }
 }
 
 std::vector<PmergeMe::ElementInfo>	PmergeMe::FordJohnsonSort( std::vector<ElementInfo> &vec )
@@ -184,11 +187,11 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::FordJohnsonSort( std::vector<Elemen
 		pairTable.push_back(e2);
 		pairIndex++;
 	}
-	if (hasStraggler)
-	{
-		ElementInfo e = { straggler.value, -1, straggler.originalIndex };
-		pairTable.push_back(e);
-	}
+	// if (hasStraggler)
+	// {
+	// 	ElementInfo e = { straggler.value, -1, straggler.originalIndex };
+	// 	pairTable.push_back(e);
+	// }
 	std::vector<ElementInfo> smallElements = vectorFromEverySecondElement(pairTable, 1);
 	std::vector<ElementInfo> largeElements = vectorFromEverySecondElement(pairTable, 0);
 	std::vector<ElementInfo> indexLookup = FordJohnsonSort( largeElements );
@@ -196,35 +199,67 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::FordJohnsonSort( std::vector<Elemen
 	std::vector<ElementInfo> pendChain = buildChain( smallElements );
 	// generate insertion sequece
 	// use insertion sequence to insert the current interstion seuence elements smallElement from the large Elements list into mainChain with binary search, with end = current jacob sequence element + 2 (i believe that to be the correct bound but should it up again)
+	insertElementsByGroups(mainChain, pendChain);
+    if (hasStraggler) {
+        std::vector<ElementInfo>::iterator it = std::lower_bound(
+            mainChain.begin(), mainChain.end(), straggler);
+        mainChain.insert(it, straggler);
+    }
 	return (mainChain);
 }
 
+PmergeMe::ElementInfo	PmergeMe::IntToElementInfo(int value, int index)
+{
+	ElementInfo e = {value, index, index};
+	return (e);
+}
 
-// void	PmergeMe::mergeInsertionSortVec( std::vector<int> &vec)
-// {
-// 	if (vec.size() <= 1)
-// 		return ;
-// 	int		straggler = -1;
-// 	bool	hasStraggler = vec.size() % 2 != 0;
-// 	if (hasStraggler)
-// 	{
-// 		straggler = vec.back();
-// 		vec.pop_back();
-// 	}
-// 	std::vector<int> originalPositions = sortInPair(vec);
-// 	std::vector<int> largeElements = vectorFromEverySecond(vec, 0);
-// 	std::vector<int> indexLookup = FordJohnsonSort( largeElements );
-//
-// 	while (/*largeElements.size > 2 */)
-// 	{
-// 	//pair up
-// 	//sort in pair (small in front, create lookup table,)
-// 	//vec of largerElements
-// 	}
-// 	//pair up
-// 	//sort in pair (small in front)
-// 	//mergeInsert
-// }
+void	PmergeMe::mergeInsertionSortVec( std::vector<int> &vec)
+{
+	if (vec.size() <= 1)
+		return ;
+	std::vector<ElementInfo> vecOfEl;
+	for (size_t i = 0; i < vec.size(); i++)
+		vecOfEl.push_back(IntToElementInfo(vec[i], i));
+	ElementInfo		straggler;
+	bool	hasStraggler = vec.size() % 2 != 0;
+	if (hasStraggler)
+	{
+		straggler = vecOfEl.back();
+		vecOfEl.pop_back();
+	}
+	std::vector<ElementInfo>			originalPositions = sortInPair(vecOfEl);
+	std::vector<ElementInfo>	pairTable;
+	int							pairIndex = 0;
+	for (size_t i = 0; i + 1 < originalPositions.size(); i += 2) {
+		ElementInfo e1 = { originalPositions[i].value,  pairIndex, originalPositions[i].originalIndex };
+		ElementInfo e2 = { originalPositions[i+1].value,  pairIndex, originalPositions[i+1].originalIndex };
+		pairTable.push_back(e1);
+		pairTable.push_back(e2);
+		pairIndex++;
+	}
+	// if (hasStraggler)
+	// {
+	// 	ElementInfo e = { straggler.value, -1, straggler.originalIndex };
+	// 	pairTable.push_back(e);
+	// }
+	std::vector<ElementInfo> smallElements = vectorFromEverySecondElement(pairTable, 1);
+	std::vector<ElementInfo> largeElements = vectorFromEverySecondElement(pairTable, 0);
+	std::vector<ElementInfo> indexLookup = FordJohnsonSort( largeElements );
+	std::vector<ElementInfo> mainChain = buildChain( largeElements );
+	std::vector<ElementInfo> pendChain = buildChain( smallElements );
+    if (hasStraggler) {
+        std::vector<ElementInfo>::iterator it = std::lower_bound(
+            mainChain.begin(), mainChain.end(), straggler);
+        mainChain.insert(it, straggler);
+    }
+	vec.clear();
+	for (std::vector<int>::reverse_iterator it = vec.rend(); it + 1 != vec.rbegin(); it++)
+	{
+		vec.push_back(mainChain.back().value);
+		mainChain.pop_back();
+	}
+}
 
 /* ====================ElementInfo Operators==================== */
 
