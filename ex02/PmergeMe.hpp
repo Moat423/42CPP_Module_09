@@ -6,7 +6,7 @@
 #include <iostream>
 
 template<typename Func, typename Container>
-double	stopwatch(Func func, Container functionArgument)
+double	stopwatch(Func func, Container &functionArgument)
 {
 	std::clock_t cStart = std::clock();
 	func(functionArgument);
