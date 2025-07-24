@@ -69,38 +69,38 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::buildChain( const std::vector<Eleme
 	chain.reserve(elementsList.size());
 	for (size_t i = 0; i < elementsList.size(); i++)
 	{
-		ElementInfo e = { elementsList[i].value, elementsList[i].originalIndex, -1 };
+		ElementInfo e = { elementsList[i].value, elementsList[i].previousIndex, -1 };
 		chain.push_back(e);
 	}
 	return (chain);
 }
 
-std::vector<size_t>	PmergeMe::generateJacobsthalNumbers(size_t n)
-{
-	std::vector<size_t>	sequence;
-
-	sequence.push_back(0);
-	sequence.push_back(1);
-	for (size_t i = 2; i < n; i++)
-	{
-		int next = sequence[i - 1] + 2 * sequence[i - 2];
-		sequence.push_back(next);
-	}
-	return (sequence);
-}
+// std::vector<size_t>	PmergeMe::generateJacobsthalNumbers(size_t n)
+// {
+// 	std::vector<size_t>	sequence;
+//
+// 	sequence.push_back(0);
+// 	sequence.push_back(1);
+// 	for (size_t i = 2; i < n; i++)
+// 	{
+// 		int next = sequence[i - 1] + 2 * sequence[i - 2];
+// 		sequence.push_back(next);
+// 	}
+// 	return (sequence);
+// }
 
 size_t getGroupSize(size_t n) {
     if (n <= 2) return 2;
     return (1U << (n-2)) + getGroupSize(n-2);
 }
-
-void	PmergeMe::insertElements(std::vector<ElementInfo>& mainChain, const std::vector<ElementInfo>& pendChain, const std::vector<int> jacobsthalNumbers)
-{
-	if (pendChain.empty()) return;
-	mainChain.insert(mainChain.begin(), pendChain[0]);
-	if (pendChain.size() == 1)
-		return ;
-}
+//
+// void	PmergeMe::insertElements(std::vector<ElementInfo>& mainChain, const std::vector<ElementInfo>& pendChain, const std::vector<int> jacobsthalNumbers)
+// {
+// 	if (pendChain.empty()) return;
+// 	mainChain.insert(mainChain.begin(), pendChain[0]);
+// 	if (pendChain.size() == 1)
+// 		return ;
+// }
 
 void	PmergeMe::insertElementsByGroups(std::vector<ElementInfo>& mainChain, const std::vector<ElementInfo>& pendChain) {
     if (pendChain.empty()) return;
