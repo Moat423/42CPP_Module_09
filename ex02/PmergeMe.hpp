@@ -28,6 +28,18 @@ void	printContainer(Container container)
 	std::cout << *it << std::endl;
 }
 
+template<typename Iterator>
+bool is_sorted(Iterator first, Iterator last) {
+    if (first == last) return true;
+    Iterator next = first;
+    ++next;
+    for (; next != last; ++first, ++next) {
+        if (*next < *first)
+            return false;
+    }
+    return true;
+}
+
 class PmergeMe {
 	public:
 		PmergeMe( void );
@@ -47,12 +59,11 @@ class PmergeMe {
 			int	previousIndex;
 			bool operator<( const ElementInfo &other ) const;
 		} ElementInfo;
-		static std::vector<PmergeMe::ElementInfo>	sortInPair( std::vector<ElementInfo> &vec );
-		static std::vector<int>	vectorFromEverySecond( const std::vector<int> vec , int n);
+		static void	insertElements(std::vector<ElementInfo>& mainChain, const std::vector<ElementInfo>& pendChain, const std::vector<int> jacobsthalNumbers);
+		static void	sortInPair( std::vector<ElementInfo> &vec );
 		static PmergeMe::ElementInfo	IntToElementInfo(int value, int index);
 		static std::vector<PmergeMe::ElementInfo>	vectorFromEverySecondElement( const std::vector<ElementInfo> vec , int n);
 		static std::vector<PmergeMe::ElementInfo>	FordJohnsonSort( std::vector<ElementInfo> &vec );
-		static PmergeMe::ElementInfo	getElementFromTableForPrevious(int index, const std::vector<ElementInfo> table);
 		static std::vector<PmergeMe::ElementInfo>	buildChain( const std::vector<ElementInfo> &largeElements );
 		static std::vector<int>	FordJohnsonSort( std::vector<int> &vec );
 		static std::vector<int>	pair( std::vector<int> &vec );

@@ -41,6 +41,7 @@ int main (int argc, char *argv[])
 	// pm.mergeInsertionSortVec(vec);
 	std::cout << YEL << "After: " << RESET;
 	printContainer(vec);
+	std::cout << "is sorted: " << (is_sorted(vec.begin(), vec.end()) ? "yes" : "no") << std::endl;
 	std::cout << "comparison count: " << PmergeMe::comparisonCount << std::endl;
 	return 0;
 }
