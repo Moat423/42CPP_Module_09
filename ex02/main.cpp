@@ -41,7 +41,7 @@ int main (int argc, char *argv[])
 	// printContainer(inderstionOrder);
 	time = stopwatch(PmergeMe::mergeInsertionSortVec, vec);
 	// pm.mergeInsertionSortVec(vec);
-	std::cout << std::fixed << std::setprecision(2) << "Time taken: " << time << " seconds" << std::endl;
+	std::cout << std::fixed << std::setprecision(5) << "Time taken: " << time * 1000.0 << " ms" << std::endl;
 	std::cout << YEL << "After: " << RESET;
 	printContainer(vec);
 	std::cout << "is sorted: " << (is_sorted(vec.begin(), vec.end()) ? "yes" : "no") << std::endl;

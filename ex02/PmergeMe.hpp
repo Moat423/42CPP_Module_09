@@ -5,6 +5,7 @@
 #include <deque>
 #include <iostream>
 
+// give back the time taken in seconds
 template<typename Func, typename Container>
 double	stopwatch(Func func, Container &functionArgument)
 {
