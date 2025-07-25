@@ -2,6 +2,7 @@
 # define PMERGEME_HPP
 #include <ctime>
 #include <vector>
+#include <list>
 #include <deque>
 #include <iostream>
 
@@ -43,15 +44,20 @@ bool is_sorted(Iterator first, Iterator last) {
 
 class PmergeMe {
 	public:
+		//contructors and destructors
 		PmergeMe( void );
 		// PmergeMe( std::string );
 		virtual ~PmergeMe();
-
 		PmergeMe(const PmergeMe &copy);
+		//operator overloads
 		PmergeMe& operator=( const PmergeMe &assign );
+		//methods
 		static void	mergeInsertionSortVec( std::vector<int> &vec);
 
+		//variables
 		static size_t	comparisonCount;
+	// LIST
+		void	mergeInsertionSortList(std::list<int> &lst);
 	private:
 		typedef struct ElementInfo
 		{
@@ -59,7 +65,12 @@ class PmergeMe {
 			int	originalIndex;
 			int	previousIndex;
 			bool operator<( const ElementInfo &other ) const;
+			bool operator==( const PmergeMe::ElementInfo &other ) const;
+			bool operator<=( const PmergeMe::ElementInfo &other ) const;
+			bool operator>=( const PmergeMe::ElementInfo &other ) const;
+			bool operator>( const PmergeMe::ElementInfo &other ) const;
 		} ElementInfo;
+
 		static void	insertElements(std::vector<ElementInfo>& mainChain, const std::vector<ElementInfo>& pendChain, const std::vector<int> jacobsthalNumbers);
 		static void	sortInPair( std::vector<ElementInfo> &vec );
 		static PmergeMe::ElementInfo	IntToElementInfo(int value, int index);
@@ -70,6 +81,12 @@ class PmergeMe {
 		static std::vector<int>	pair( std::vector<int> &vec );
 		static std::vector<size_t>	generateJacobsthalNumbers(size_t n);
 		static void	insertElementsByGroups(std::vector<ElementInfo>& mainChain, const std::vector<ElementInfo>& pendChain);
+	// LIST
+		typedef struct node
+		{
+			int value;
+			struct node	*prev;
+		} node ;
 };
 
 

@@ -1,7 +1,7 @@
 #include "PmergeMe.hpp"
 #include "Debug.hpp"
 #include <algorithm>
-#include <stdexcept>
+#include <list>
 #include <vector>
 
 size_t PmergeMe::comparisonCount = 0;
@@ -44,7 +44,7 @@ PmergeMe& PmergeMe::operator=( const PmergeMe &assign )
 void	PmergeMe::sortInPair( std::vector<ElementInfo> &vec )
 {
 	for (size_t i = 0; i < vec.size() - 1; i += 2)
-		if (vec[i] < vec [i + 1])
+		if (vec[i] > vec [i + 1])
 			std::swap(vec[i], vec[i + 1]);
 }
 
@@ -93,7 +93,7 @@ size_t getGroupSize(size_t n) {
     if (n <= 2) return 2;
     return (1U << (n-2)) + getGroupSize(n-2);
 }
-//
+
 // void	PmergeMe::insertElements(std::vector<ElementInfo>& mainChain, const std::vector<ElementInfo>& pendChain, const std::vector<int> jacobsthalNumbers)
 // {
 // 	if (pendChain.empty()) return;
@@ -179,11 +179,11 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::FordJohnsonSort( std::vector<Elemen
 			hasStraggler = false;
 		}
 	}
-	std::vector<ElementInfo> smallElements = vectorFromEverySecondElement(pairTable, 1);
-	std::vector<ElementInfo> largeElements = vectorFromEverySecondElement(pairTable, 0);
+	std::vector<ElementInfo> pendChain = vectorFromEverySecondElement(pairTable, 0);
+	std::vector<ElementInfo> largeElements = vectorFromEverySecondElement(pairTable, 1);
 	std::vector<ElementInfo> indexLookup = FordJohnsonSort( largeElements );
 	std::vector<ElementInfo> mainChain = buildChain( indexLookup );
-	std::vector<ElementInfo> pendChain = buildChain( smallElements );
+	// std::vector<ElementInfo> pendChain = buildChain( smallElements );
 	// generate insertion sequece
 	// use insertion sequence to insert the current interstion seuence elements smallElement from the large Elements list into mainChain with binary search, with end = current jacob sequence element + 2 (i believe that to be the correct bound but should it up again)
 	insertElementsByGroups(mainChain, pendChain);
@@ -213,10 +213,43 @@ void	PmergeMe::mergeInsertionSortVec( std::vector<int> &vec)
 		vec.push_back(sortedElements[i].value);
 }
 
+// void	PmergeMe::mergeInsertionSortList(std::list<int> &lst)
+// {
+// 	if (lst.size() <= 1)
+// 		return ;
+// 	std::list<node> tree;
+// 	while ()
+// }
+
 /* ====================ElementInfo Operators==================== */
+
+bool PmergeMe::ElementInfo::operator==( const ElementInfo &other ) const
+{
+	PmergeMe::comparisonCount++;
+	return (this->value == other.value);
+}
+
+bool PmergeMe::ElementInfo::operator<=( const ElementInfo &other ) const
+{
+	PmergeMe::comparisonCount++;
+	return (this->value <= other.value);
+}
+
+bool PmergeMe::ElementInfo::operator>=( const ElementInfo &other ) const
+{
+	PmergeMe::comparisonCount++;
+	return (this->value >= other.value);
+}
 
 bool PmergeMe::ElementInfo::operator<( const ElementInfo &other ) const
 {
 	PmergeMe::comparisonCount++;
 	return (this->value < other.value);
 }
+
+bool PmergeMe::ElementInfo::operator>( const ElementInfo &other ) const
+{
+	PmergeMe::comparisonCount++;
+	return (this->value > other.value);
+}
+
