@@ -62,14 +62,16 @@ class PmergeMe {
 		typedef struct ElementInfo
 		{
 			int	value;
-			int	originalIndex;
-			int	previousIndex;
+			size_t	originalIndex;
+			// int	previousIndex;
 			bool operator<( const ElementInfo &other ) const;
 			bool operator==( const PmergeMe::ElementInfo &other ) const;
 			bool operator<=( const PmergeMe::ElementInfo &other ) const;
 			bool operator>=( const PmergeMe::ElementInfo &other ) const;
 			bool operator>( const PmergeMe::ElementInfo &other ) const;
 		} ElementInfo;
+		static std::vector<size_t> generateInsertionOrder(size_t pendSize);
+		static std::vector<ElementInfo>	fordJohnsonSort( std::vector<ElementInfo> &vec );
 
 		static void	insertElements(std::vector<ElementInfo>& mainChain, const std::vector<ElementInfo>& pendChain, const std::vector<int> jacobsthalNumbers);
 		static void	sortInPair( std::vector<ElementInfo> &vec );
