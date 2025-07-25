@@ -75,19 +75,19 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::buildChain( const std::vector<Eleme
 	return (chain);
 }
 
-// std::vector<size_t>	PmergeMe::generateJacobsthalNumbers(size_t n)
-// {
-// 	std::vector<size_t>	sequence;
-//
-// 	sequence.push_back(0);
-// 	sequence.push_back(1);
-// 	for (size_t i = 2; i < n; i++)
-// 	{
-// 		int next = sequence[i - 1] + 2 * sequence[i - 2];
-// 		sequence.push_back(next);
-// 	}
-// 	return (sequence);
-// }
+std::vector<size_t>	PmergeMe::generateJacobsthalNumbers(size_t n)
+{
+	std::vector<size_t>	sequence;
+
+	sequence.push_back(0);
+	sequence.push_back(1);
+	for (size_t i = 2; i < n; i++)
+	{
+		int next = sequence[i - 1] + 2 * sequence[i - 2];
+		sequence.push_back(next);
+	}
+	return (sequence);
+}
 
 size_t getGroupSize(size_t n) {
     if (n <= 2) return 2;
@@ -170,11 +170,15 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::FordJohnsonSort( std::vector<Elemen
 		pairTable.push_back(e2);
 		pairIndex++;
 	}
-	// if (hasStraggler)
-	// {
-	// 	ElementInfo e = { straggler.value, -1, straggler.originalIndex };
-	// 	pairTable.push_back(e);
-	// }
+	if (hasStraggler)
+	{
+		std::vector<size_t> jacobsthalNumbers = generateJacobsthalNumbers(pairTable.size() + 2);
+		if (std::find(jacobsthalNumbers.begin(), jacobsthalNumbers.end(), pairTable.size() + 2) != jacobsthalNumbers.end())
+		{
+			pairTable.push_back(straggler);
+			hasStraggler = false;
+		}
+	}
 	std::vector<ElementInfo> smallElements = vectorFromEverySecondElement(pairTable, 1);
 	std::vector<ElementInfo> largeElements = vectorFromEverySecondElement(pairTable, 0);
 	std::vector<ElementInfo> indexLookup = FordJohnsonSort( largeElements );
@@ -186,7 +190,8 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::FordJohnsonSort( std::vector<Elemen
     if (hasStraggler) {
         std::vector<ElementInfo>::iterator it = std::lower_bound(
             mainChain.begin(), mainChain.end(), straggler);
-        mainChain.insert(it, straggler);
+		ElementInfo e = { straggler.value, straggler.previousIndex, -1 };
+        mainChain.insert(it, e);
     }
 	return (mainChain);
 }

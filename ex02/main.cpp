@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <iomanip>
 #include <iostream>
 #include "PmergeMe.hpp"
 #include <limits>
@@ -15,6 +16,7 @@ int main (int argc, char *argv[])
 	int					input;
 	long				linput;
 	char				*endptr;
+	double					time;
 	std::vector<int>	vec;
 	std::deque<int>		deq;
 	for (int i = 1; argv[i] != NULL; i++)
@@ -37,8 +39,9 @@ int main (int argc, char *argv[])
 	// PmergeMe pm;
 	// std::vector<int> inderstionOrder = pm.generateInsertionSequence(7);
 	// printContainer(inderstionOrder);
-	stopwatch(PmergeMe::mergeInsertionSortVec, vec);
+	time = stopwatch(PmergeMe::mergeInsertionSortVec, vec);
 	// pm.mergeInsertionSortVec(vec);
+	std::cout << std::fixed << std::setprecision(2) << "Time taken: " << time << " seconds" << std::endl;
 	std::cout << YEL << "After: " << RESET;
 	printContainer(vec);
 	std::cout << "is sorted: " << (is_sorted(vec.begin(), vec.end()) ? "yes" : "no") << std::endl;
