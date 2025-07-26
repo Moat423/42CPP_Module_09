@@ -48,6 +48,39 @@ the first line is the one with the theoretical minimum.
 
 I will pair, create a table, assign an index to each pair and then separate the large elements from that table and attribute them with the index, so that when i give them into the next deeper level of pairing as an input, the lookup table created at that point will contain elements paired with an index. These are paired with the new index and from that table i extract the large elements and attribute them with the new index from the current table. That way, at each depth level, there is a table, from which i will then be able to build the main chain back up again, containing information from the previous depth level, so that i can look up the correct elements there. That means, once the pairing is all done, it will return and merge. The merging will use the index table at that step, to create a main chain that is ready for insertion from the vector that was returned in pairing. It will look up the larger element at the index in the order of the returned vec from pairing and then copy that element into a new main chain. This element will contain information for it's value, as well as it's index for the previous recursion level, which is not yet relevant. But the insertion will take place with elements from the table. Then this function will return and return it's modified vector to the previous depth level and so on.
 
+I was thinking we could use previousIndex in combination with originalIndex. and before we recourse, we just set originalIndex to the new pair index and the previous index to the original index before its rewrite. and then when we go back up, we do the same thing backwards, that way, we can have an actual lookup. so when we are at the deepest level, we move previoursIndex to originalIndex. and with original index, we then know which elements from largerElements we need to take to build the current mainChain. these would have the correct index relationship for this level. but we actually already need to prepare every element for the next step, by moving previous index to original index. OR actually, even better, after the recursive call, we just work with previousIndex for the mergeInsertion. and while we do that, we use the elements from before the function fordJohnsonSort returned to give us the correct order, and build the main chain from elements from the beginning. and the pend chain as well. then on the next level we can use that prev info.
+
+so lets suppose a little like this:
+
+8 1 4 9 2 7 3 6
+pair and sort
+|idx| smaller| larger|
+| 0 | 1 | 8 |
+| 1 | 4 | 9 |
+| 2 | 2 | 7 |
+| 3 | 3 | 6 |
+
+recurse with:
+(8,0,-1)(9,1,-1)(7,2,-1)(6,3,-1)
+
+pair and sort:
+|idx| smaller| larger|
+| 0 | 8 | 9 |
+| 1 | 6 | 7 |
+
+recurse with:
+(9,0,1)(7,1,2)
+
+pair and sort:
+| 0 | 7 | 9 |
+rec with
+(9,0,0)
+-->return 
+look up idx 0 (previousIndex)
+take (9,0,1) into mainChain, insert (7,1,2)
+return (7,1,2)(9,0,1)
+look up idx 2 and 1 once for mainChain, once for pendChain
+....
 #### generateing the insertion sequence:
 
 pseudocode:

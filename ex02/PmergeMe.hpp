@@ -56,13 +56,14 @@ class PmergeMe {
 
 		//variables
 		static size_t	comparisonCount;
+		static size_t	level;
 	// LIST
 		void	mergeInsertionSortList(std::list<int> &lst);
-	private:
 		typedef struct ElementInfo
 		{
 			int	value;
 			size_t	originalIndex;
+			size_t	previousIndex;
 			// int	previousIndex;
 			bool operator<( const ElementInfo &other ) const;
 			bool operator==( const PmergeMe::ElementInfo &other ) const;
@@ -70,6 +71,7 @@ class PmergeMe {
 			bool operator>=( const PmergeMe::ElementInfo &other ) const;
 			bool operator>( const PmergeMe::ElementInfo &other ) const;
 		} ElementInfo;
+	private:
 		static std::vector<size_t> generateInsertionOrder(size_t pendSize);
 		static std::vector<ElementInfo>	fordJohnsonSort( std::vector<ElementInfo> &vec );
 
@@ -91,6 +93,7 @@ class PmergeMe {
 		} node ;
 };
 
+std::ostream& operator<<(std::ostream& os, const PmergeMe::ElementInfo& info);
 
 #endif // !PMERGEME_HPP
 

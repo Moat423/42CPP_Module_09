@@ -42,9 +42,13 @@ int main (int argc, char *argv[])
 	time = stopwatch(PmergeMe::mergeInsertionSortVec, vec);
 	// pm.mergeInsertionSortVec(vec);
 	std::cout << std::fixed << std::setprecision(5) << "Time taken: " << time * 1000.0 << " ms" << std::endl;
-	std::cout << YEL << "After: " << RESET;
+	std::cout << YEL << "After:  " << RESET;
 	printContainer(vec);
-	std::cout << "is sorted: " << (is_sorted(vec.begin(), vec.end()) ? "yes" : "no") << std::endl;
+	std::cout << "is sorted: ";
+	if (is_sorted(vec.begin(), vec.end()))
+		std::cout << GREEN << "yes" << RESET << std::endl;
+	else
+		std::cout << RED << "no" << RESET << std::endl;
 	std::cout << "comparison count: " << PmergeMe::comparisonCount << std::endl;
 	return 0;
 }
