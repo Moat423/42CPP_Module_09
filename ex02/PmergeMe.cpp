@@ -172,9 +172,13 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::fordJohnsonSort( std::vector<Elemen
 	std::cout << CYN "Level: " << level++ << RESET << std::endl;
 	std::cout << "fordJohnsonSort called with: "  << std::endl;
 	printContainer(vec);
-	if (vec.size() <= 1)
-		return (vec);
 	std::vector<ElementInfo> elements = vec;
+	if (vec.size() <= 1)
+	{
+		elements[0].originalIndex = 0;
+		elements[0].previousIndex = elements[0].originalIndex;
+		return (elements);
+	}
 	ElementInfo	straggler;
 	bool		hasStraggler = (elements.size() % 2 == 1);
 	if (hasStraggler)
@@ -184,50 +188,40 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::fordJohnsonSort( std::vector<Elemen
 	}
 	// pair and extract ( larger is in odd position)
 	std::vector<ElementInfo> largerElements;
-	std::vector<ElementInfo> smallerElements;
 	for (size_t i = 0; i < elements.size(); i += 2)
 	{
 		if (elements[i] > elements[i + 1])
 			std::swap(elements[i], elements[i + 1]);
-		smallerElements.push_back(elements[i]);
-		largerElements.push_back(elements[i + 1]);
-	}
-	if (smallerElements.size() != largerElements.size())
-		throw std::logic_error("Size mismatch between smaller and larger elements");
-	// move originalIndex to previousIndex
-	// set originalIndex to index in elements
-	for (size_t i = 0; i < elements.size(); i++)
-	{
 		elements[i].previousIndex = elements[i].originalIndex;
 		elements[i].originalIndex = i;
-		if (i % 2 == 0)
-			largerElements[i / 2].previousIndex = elements[i].previousIndex;
-		else
-			smallerElements[i / 2].previousIndex = elements[i].previousIndex;
+		largerElements.push_back(elements[i + 1]);
 	}
-	std::cout << "smallerElements: "  << std::endl;
-	printContainer(smallerElements);
+	if (elements.size() / 2 != largerElements.size())
+		throw std::logic_error("Size mismatch");
 	std::cout << "largerElements: "  << std::endl;
 	printContainer(largerElements);
 	std::vector<ElementInfo> sortedLarger = fordJohnsonSort(largerElements);
+
 	std::cout << CYN "returned to Level: " << --level << RESET << std::endl;
 	std::cout << "with: sortedLarger: "  << std::endl;
 	printContainer(sortedLarger);
-	// make mainChain from sortedLarger by looking up previousIndex in largerElements
+	// if (sortedLarger.size() == 1)
+	// {
+	// 	sortedLarger[0] = (elements[sortedLarger[0].previousIndex]);
+	// 	return (sortedLarger);
+	// }
 	std::vector<ElementInfo> mainChain;
 	mainChain.reserve(sortedLarger.size());
+	std::vector<ElementInfo> pendChain;
+	pendChain.reserve(mainChain.size() + (1 & hasStraggler));
 	for (size_t i = 0; i < sortedLarger.size(); i++)
 	{
-		mainChain[i] = elements[sortedLarger[i].originalIndex];
+		mainChain[i] = elements[sortedLarger[i].previousIndex];
+		pendChain.push_back(elements[sortedLarger[i].previousIndex - 1]);
 		sortedLarger[i] = mainChain[i];
 	}
 	std::cout << "mainChain: "  << std::endl;
 	printContainer(mainChain);
-	std::vector<ElementInfo> pendChain;
-	pendChain.reserve(mainChain.size() + (1 & hasStraggler));
-	// find CORRESPONDING smaller Element (to element in sortedLarger)
-	for (size_t i = 0; i < sortedLarger.size(); i++)
-		pendChain.push_back(smallerElements[sortedLarger[i].previousIndex]);
 	std::cout << "pendChain: "  << std::endl;
 	printContainer(pendChain);
 	if (!pendChain.empty())
@@ -287,7 +281,7 @@ void	PmergeMe::mergeInsertionSortVec( std::vector<int> &vec)
 	elements.reserve(vec.size());
 	for (size_t i = 0; i < vec.size(); i++)
 	{
-		ElementInfo e ={vec[i], i / 2, std::numeric_limits<size_t>::max()};
+		ElementInfo e ={vec[i], i, std::numeric_limits<size_t>::max()};
 		elements.push_back(e);
 	}
 	std::vector<ElementInfo> sorted = fordJohnsonSort(elements);
