@@ -175,8 +175,9 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::fordJohnsonSort( std::vector<Elemen
 	std::vector<ElementInfo> elements = vec;
 	if (vec.size() <= 1)
 	{
-		elements[0].originalIndex = 0;
 		elements[0].previousIndex = elements[0].originalIndex;
+		elements[0].originalIndex = 0;
+		std::cout << RED << "Base case reached with single element: " <<RESET<< elements[0] << std::endl;
 		return (elements);
 	}
 	ElementInfo	straggler;
@@ -205,7 +206,7 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::fordJohnsonSort( std::vector<Elemen
 	std::vector<ElementInfo> sortedLarger = fordJohnsonSort(largerElements);
 
 	std::cout << CYN "returned to Level: " << --level << RESET << std::endl;
-	std::cout << "with: sortedLarger: "  << std::endl;
+	std::cout << "with sortedLarger: "  << std::endl;
 	printContainer(sortedLarger);
 	std::vector<ElementInfo> mainChain;
 	mainChain.reserve(sortedLarger.size());
@@ -214,7 +215,8 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::fordJohnsonSort( std::vector<Elemen
 	for (size_t i = 0; i < sortedLarger.size(); i++)
 	{
 		mainChain[i] = elements[sortedLarger[i].previousIndex];
-		sortedLarger[i] = mainChain[i];
+		std::cout << "adding to mainChain element at index: " << sortedLarger[i].previousIndex << " with value: "<< elements[sortedLarger[i].previousIndex] << std::endl;
+		// sortedLarger[i] = mainChain[i];
 		if (sortedLarger.size() == 1)
 			continue;
 		pendChain.push_back(elements[sortedLarger[i].originalIndex - 1]);
