@@ -135,37 +135,56 @@ std::vector<size_t> PmergeMe::generateInsertionOrder(size_t pendSize)
 	}
 	return (insertionOrder);
 }
-/*
-8 1 4 9 2 7 3 6
-pair and sort
-|idx| smaller| larger|
-| 0 | 1 | 8 |
-| 1 | 4 | 9 |
-| 2 | 2 | 7 |
-| 3 | 3 | 6 |
 
-recurse with:
-(8,0,-1)(9,1,-1)(7,2,-1)(6,3,-1)
+//mergeInsertion with jacobsthal numbers
+std::vector<PmergeMe::ElementInfo>	PmergeMe::mergeInsertElements(
+		const std::vector<ElementInfo>& lookupSortedSequence, const std::vector<ElementInfo>& pendChain, std::vector<size_t> JacobsthalNumbers)
+{
+	std::vector<size_t> jacobsthalNumbers = generateJacobsthalNumbers(pendChain.size() + 2);
+	std::vector<ElementInfo> mainChain = lookupSortedSequence;
+	mainChain.insert(mainChain.begin(), pendChain[0]);
+	std::vector<size_t> insertionOrder = generateInsertionOrder(pendChain.size());
+	for (size_t i = 1; i < insertionOrder.size(); i++)
+	{
+		size_t	pendIdx = insertionOrder[i];
+		// pretty sure this step is not needed, because of how the insertionOrder generation already
+		// excludes those values, but one can go sure, unless we just did the loops right here.
+		// for later:
+		// I think it's very inefficient, although more intuitive to first generate an insertion order.
+		// there should just be some nested loops here, that walk backward and so on.
+		if (pendIdx >= pendChain.size())
+			continue;
+		const ElementInfo& elemToInsert = pendChain[pendIdx];
+		// find position of large Element in main chain, that is partner to
+		// currently to insert small element and save it in upperBound
+		size_t upperBound = mainChain.size();
+		if (pendIdx < sortedLarger.size())
+		{
+			for (size_t j = 0; j < mainChain.size(); j++)
+			{
+				if (mainChain[j].value == sortedLarger[pendIdx].value
+					&& mainChain[j].originalIndex == sortedLarger[pendIdx].originalIndex)
+				{
+					upperBound = j;
+					break;
+				}
+			}
+		}
+		//binary search within bounded range
+		std::vector<ElementInfo>::iterator insertionPoint = std::lower_bound(
+				mainChain.begin(), mainChain.begin() + upperBound,
+				elemToInsert);
+		mainChain.insert(insertionPoint, elemToInsert);
+	}
+	if (hasStraggler)
+	{
+		std::vector<ElementInfo>::iterator insertionPoint = std::lower_bound(
+				mainChain.begin(), mainChain.end(),
+				straggler);
+		mainChain.insert(insertionPoint, straggler);
+	}
+}
 
-pair and sort:
-|idx| smaller| larger|
-| 0 | 8 | 9 |
-| 1 | 6 | 7 |
-
-recurse with:
-(9,0,1)(7,1,2)
-
-pair and sort:
-| 0 | 7 | 9 |
-rec with
-(9,0,0)
--->return 
-look up idx 0 (previousIndex)
-take (9,0,1) into mainChain, insert (7,1,2)
-return (7,1,2)(9,0,1)
-look up idx 2 and 1 once for mainChain, once for pendChain
-....
-*/
 
 std::vector<PmergeMe::ElementInfo>	PmergeMe::fordJohnsonSort( std::vector<ElementInfo> &vec)
 {
@@ -214,7 +233,6 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::fordJohnsonSort( std::vector<Elemen
 	pendChain.reserve(mainChain.size() + (1 & hasStraggler));
 	for (size_t i = 0; i < sortedLarger.size(); i++)
 	{
-		std::cout << "adding to mainChain element at index: " << sortedLarger[i].previousIndex << " with value: "<< elements[sortedLarger[i].previousIndex] << std::endl;
 		mainChain.push_back(elements[sortedLarger[i].previousIndex]);
 		sortedLarger[i] = mainChain[i];
 		pendChain.push_back(elements[sortedLarger[i].originalIndex - 1]);
@@ -223,42 +241,42 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::fordJohnsonSort( std::vector<Elemen
 	printContainer(mainChain);
 	std::cout << "pendChain: "  << std::endl;
 	printContainer(pendChain);
-	if (!pendChain.empty())
+	if (pendChain.size() == 0)
+		throw std::logic_error("pendChain is empty, but should not be");
+	std::vector<size_t> jacobsthalNumbers = generateJacobsthalNumbers(pendChain.size() + 2);
+	mainChain.insert(mainChain.begin(), pendChain[0]);
+	std::vector<size_t> insertionOrder = generateInsertionOrder(pendChain.size());
+	for (size_t i = 1; i < insertionOrder.size(); i++)
 	{
-		mainChain.insert(mainChain.begin(), pendChain[0]);
-		std::vector<size_t> insertionOrder = generateInsertionOrder(pendChain.size());
-		for (size_t i = 1; i < insertionOrder.size(); i++)
+		size_t	pendIdx = insertionOrder[i];
+		// pretty sure this step is not needed, because of how the insertionOrder generation already
+		// excludes those values, but one can go sure, unless we just did the loops right here.
+		// for later:
+		// I think it's very inefficient, although more intuitive to first generate an insertion order.
+		// there should just be some nested loops here, that walk backward and so on.
+		if (pendIdx >= pendChain.size())
+			continue;
+		const ElementInfo& elemToInsert = pendChain[pendIdx];
+		// find position of large Element in main chain, that is partner to
+		// currently to insert small element and save it in upperBound
+		size_t upperBound = mainChain.size();
+		if (pendIdx < sortedLarger.size())
 		{
-			size_t	pendIdx = insertionOrder[i];
-			// pretty sure this step is not needed, because of how the insertionOrder generation already
-			// excludes those values, but one can go sure, unless we just did the loops right here.
-			// for later:
-			// I think it's very inefficient, although more intuitive to first generate an insertion order.
-			// there should just be some nested loops here, that walk backward and so on.
-			if (pendIdx >= pendChain.size())
-				continue;
-			const ElementInfo& elemToInsert = pendChain[pendIdx];
-			// find position of large Element in main chain, that is partner to
-			// currently to insert small element and save it in upperBound
-			size_t upperBound = mainChain.size();
-			if (pendIdx < sortedLarger.size())
+			for (size_t j = 0; j < mainChain.size(); j++)
 			{
-				for (size_t j = 0; j < mainChain.size(); j++)
+				if (mainChain[j].value == sortedLarger[pendIdx].value
+					&& mainChain[j].originalIndex == sortedLarger[pendIdx].originalIndex)
 				{
-					if (mainChain[j].value == sortedLarger[pendIdx].value
-						&& mainChain[j].originalIndex == sortedLarger[pendIdx].originalIndex)
-					{
-						upperBound = j;
-						break;
-					}
+					upperBound = j;
+					break;
 				}
 			}
-			//binary search within bounded range
-			std::vector<ElementInfo>::iterator insertionPoint = std::lower_bound(
-					mainChain.begin(), mainChain.begin() + upperBound,
-					elemToInsert);
-			mainChain.insert(insertionPoint, elemToInsert);
 		}
+		//binary search within bounded range
+		std::vector<ElementInfo>::iterator insertionPoint = std::lower_bound(
+				mainChain.begin(), mainChain.begin() + upperBound,
+				elemToInsert);
+		mainChain.insert(insertionPoint, elemToInsert);
 	}
 	if (hasStraggler)
 	{

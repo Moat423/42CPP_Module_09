@@ -75,6 +75,8 @@ class PmergeMe {
 	private:
 		static std::vector<size_t> generateInsertionOrder(size_t pendSize);
 		static std::vector<ElementInfo>	fordJohnsonSort( std::vector<ElementInfo> &vec );
+		static std::vector<PmergeMe::ElementInfo>	mergeInsertElements(
+				const std::vector<ElementInfo>& lookupSortedSequence, const std::vector<ElementInfo>& pendChain, std::vector<size_t> JacobsthalNumbers);
 
 		static void	insertElements(std::vector<ElementInfo>& mainChain, const std::vector<ElementInfo>& pendChain, const std::vector<int> jacobsthalNumbers);
 		static void	sortInPair( std::vector<ElementInfo> &vec );
