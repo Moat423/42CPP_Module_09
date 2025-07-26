@@ -65,6 +65,7 @@ class PmergeMe {
 			size_t	originalIndex;
 			size_t	previousIndex;
 			// int	previousIndex;
+			ElementInfo& operator=( const ElementInfo &assign );
 			bool operator<( const ElementInfo &other ) const;
 			bool operator==( const PmergeMe::ElementInfo &other ) const;
 			bool operator<=( const PmergeMe::ElementInfo &other ) const;

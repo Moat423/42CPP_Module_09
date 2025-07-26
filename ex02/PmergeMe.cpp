@@ -166,11 +166,15 @@ return (7,1,2)(9,0,1)
 look up idx 2 and 1 once for mainChain, once for pendChain
 ....
 */
-std::vector<PmergeMe::ElementInfo>	PmergeMe::fordJohnsonSort( std::vector<ElementInfo> &elements)
+
+std::vector<PmergeMe::ElementInfo>	PmergeMe::fordJohnsonSort( std::vector<ElementInfo> &vec)
 {
-	std::cout << "Level: " << level++ << std::endl;
-	if (elements.size() <= 1)
-		return (elements);
+	std::cout << CYN "Level: " << level++ << RESET << std::endl;
+	std::cout << "fordJohnsonSort called with: "  << std::endl;
+	printContainer(vec);
+	if (vec.size() <= 1)
+		return (vec);
+	std::vector<ElementInfo> elements = vec;
 	ElementInfo	straggler;
 	bool		hasStraggler = (elements.size() % 2 == 1);
 	if (hasStraggler)
@@ -191,34 +195,39 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::fordJohnsonSort( std::vector<Elemen
 	if (smallerElements.size() != largerElements.size())
 		throw std::logic_error("Size mismatch between smaller and larger elements");
 	// move originalIndex to previousIndex
-	// set originalIndex to pair index
-	for (size_t i = 0; i < smallerElements.size(); i++)
+	// set originalIndex to index in elements
+	for (size_t i = 0; i < elements.size(); i++)
 	{
-		smallerElements[i].previousIndex = smallerElements[i].originalIndex;
-		largerElements[i].previousIndex = largerElements[i].originalIndex;
-		smallerElements[i].originalIndex = i;
-		largerElements[i].originalIndex = i;
+		elements[i].previousIndex = elements[i].originalIndex;
+		elements[i].originalIndex = i;
+		if (i % 2 == 0)
+			largerElements[i / 2].previousIndex = elements[i].previousIndex;
+		else
+			smallerElements[i / 2].previousIndex = elements[i].previousIndex;
 	}
 	std::cout << "smallerElements: "  << std::endl;
 	printContainer(smallerElements);
 	std::cout << "largerElements: "  << std::endl;
 	printContainer(largerElements);
 	std::vector<ElementInfo> sortedLarger = fordJohnsonSort(largerElements);
-	std::cout << "returned to Level: " << --level << std::endl;
+	std::cout << CYN "returned to Level: " << --level << RESET << std::endl;
+	std::cout << "with: sortedLarger: "  << std::endl;
+	printContainer(sortedLarger);
 	// make mainChain from sortedLarger by looking up previousIndex in largerElements
+	std::vector<ElementInfo> mainChain;
+	mainChain.reserve(sortedLarger.size());
 	for (size_t i = 0; i < sortedLarger.size(); i++)
 	{
-		sortedLarger[i].originalIndex = largerElements[sortedLarger[i].previousIndex].originalIndex;
-		sortedLarger[i].previousIndex = largerElements[sortedLarger[i].previousIndex].previousIndex;
+		mainChain[i] = elements[sortedLarger[i].originalIndex];
+		sortedLarger[i] = mainChain[i];
 	}
-	std::vector<ElementInfo> mainChain = sortedLarger;
-	std::cout << "sortedLarger: "  << std::endl;
-	printContainer(sortedLarger);
+	std::cout << "mainChain: "  << std::endl;
+	printContainer(mainChain);
 	std::vector<ElementInfo> pendChain;
-	pendChain.reserve(mainChain.size() + hasStraggler);
+	pendChain.reserve(mainChain.size() + (1 & hasStraggler));
 	// find CORRESPONDING smaller Element (to element in sortedLarger)
 	for (size_t i = 0; i < sortedLarger.size(); i++)
-		pendChain.push_back(smallerElements[sortedLarger[i].originalIndex]);
+		pendChain.push_back(smallerElements[sortedLarger[i].previousIndex]);
 	std::cout << "pendChain: "  << std::endl;
 	printContainer(pendChain);
 	if (!pendChain.empty())
@@ -444,4 +453,12 @@ std::ostream& operator<<(std::ostream& os, const PmergeMe::ElementInfo& info) {
        << ", origIdx: " << info.originalIndex 
        << ", prevIdx: " << info.previousIndex << "]";
     return os;
+}
+
+PmergeMe::ElementInfo& PmergeMe::ElementInfo::operator=( const ElementInfo &assign )
+{
+	this->value = assign.value;
+	this->originalIndex = assign.originalIndex;
+	this->previousIndex = assign.previousIndex;
+	return (*this);
 }
