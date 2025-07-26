@@ -147,7 +147,7 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::mergeInsertElements(
 	size_t previousJacob = 1;
 	for (size_t i = 1; i < pendChain.size(); i++)
 	{
-		const size_t currentJacob = jacobsthalNumbers[i];
+		size_t currentJacob = jacobsthalNumbers[i];
 		for (size_t j = currentJacob; j > previousJacob; j--)
 		{
 			const ElementInfo& elemToInsert = pendChain[j - 1];
@@ -236,7 +236,7 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::fordJohnsonSort( std::vector<Elemen
 	std::cout << "jacobsthalNumbers: "  << std::endl;
 	printContainer(jacobsthalNumbers);
 	std::cout << "size of pendChain: " << pendChain.size() << std::endl;
-	if (pendChain.size() + 1 == jacobsthalNumbers.back())
+	if (hasStraggler && pendChain.size() + 1 == jacobsthalNumbers.back())
 	{
 		hasStraggler = false;
 		pendChain.push_back(straggler);
