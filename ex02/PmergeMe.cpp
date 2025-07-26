@@ -214,11 +214,9 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::fordJohnsonSort( std::vector<Elemen
 	pendChain.reserve(mainChain.size() + (1 & hasStraggler));
 	for (size_t i = 0; i < sortedLarger.size(); i++)
 	{
-		mainChain[i] = elements[sortedLarger[i].previousIndex];
 		std::cout << "adding to mainChain element at index: " << sortedLarger[i].previousIndex << " with value: "<< elements[sortedLarger[i].previousIndex] << std::endl;
-		// sortedLarger[i] = mainChain[i];
-		if (sortedLarger.size() == 1)
-			continue;
+		mainChain.push_back(elements[sortedLarger[i].previousIndex]);
+		sortedLarger[i] = mainChain[i];
 		pendChain.push_back(elements[sortedLarger[i].originalIndex - 1]);
 	}
 	std::cout << "mainChain: "  << std::endl;
