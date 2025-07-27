@@ -170,10 +170,14 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::mergeInsertElements(
 						break;
 					}
 				}
+				std::cout << "Element at upperBound in mainChain: " << mainChain[bound] << std::endl;
+			}
+			else
+			{
+				std::cout << "pendChainIndexToInsert is out of bounds for lookupSortedSequence because it is STRAGGLER, using mainChain size as bound" << std::endl;
 			}
 			//binary search within bounded range
 			std::cout << "Inserting element: " << elemToInsert << " with lower_bound at index: " << bound << std::endl;
-			std::cout << "Element at upperBound in mainChain: " << mainChain[bound] << std::endl;
 			std::vector<ElementInfo>::iterator insertionPoint = std::lower_bound(
 					mainChain.begin(), mainChain.begin() + bound,
 					elemToInsert);
@@ -201,24 +205,32 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::fordJohnsonSort( std::vector<Elemen
 		std::cout << RED << "Base case reached with single element: " <<RESET<< elements[0] << std::endl;
 		return (elements);
 	}
+	// pair and extract ( larger is in odd position)
+	std::vector<ElementInfo> largerElements;
+	size_t	elementsIndex = 0;
+	while (elementsIndex < elements.size() && elementsIndex + 1 < elements.size())
+	{
+		if (elements[elementsIndex] > elements[elementsIndex + 1])
+			std::swap(elements[elementsIndex], elements[elementsIndex + 1]);
+		elements[elementsIndex].previousIndex = elements[elementsIndex].originalIndex;
+		elements[elementsIndex].originalIndex = elementsIndex;
+		elements[elementsIndex + 1].previousIndex = elements[elementsIndex + 1].originalIndex;
+		elements[elementsIndex + 1].originalIndex = elementsIndex + 1;
+		largerElements.push_back(elements[elementsIndex + 1]);
+		elementsIndex += 2;
+	}
 	ElementInfo	straggler;
 	bool		hasStraggler = (elements.size() % 2 == 1);
 	if (hasStraggler)
 	{
-		straggler = elements.back();
+		if (elementsIndex  + 1 != elements.size())
+			throw std::logic_error("elementsIndex when detected a straggler is not the last element");
+		// set with marker sizemax to mark straggler inside chain
+		straggler.value = elements.back().value;
+		straggler.originalIndex = std::numeric_limits<size_t>::max();
+		straggler.previousIndex = elements.back().originalIndex;
 		elements.pop_back();
-	}
-	// pair and extract ( larger is in odd position)
-	std::vector<ElementInfo> largerElements;
-	for (size_t i = 0; i < elements.size(); i += 2)
-	{
-		if (elements[i] > elements[i + 1])
-			std::swap(elements[i], elements[i + 1]);
-		elements[i].previousIndex = elements[i].originalIndex;
-		elements[i].originalIndex = i;
-		elements[i + 1].previousIndex = elements[i + 1].originalIndex;
-		elements[i + 1].originalIndex = i + 1;
-		largerElements.push_back(elements[i + 1]);
+		std::cout << BLUE << "hasStraggler is true, straggler: " << straggler << RESET << std::endl;
 	}
 	if (elements.size() / 2 != largerElements.size())
 		throw std::logic_error("Size mismatch");
@@ -246,15 +258,19 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::fordJohnsonSort( std::vector<Elemen
 	std::cout << "jacobsthalNumbers: "  << std::endl;
 	printContainer(jacobsthalNumbers);
 	std::cout << "size of pendChain: " << pendChain.size() << std::endl;
-	if (hasStraggler && pendChain.size() + 1 == jacobsthalNumbers.back())
+	if (hasStraggler && pendChain.size() == jacobsthalNumbers.back() - 1)
 	{
+		std::cout << "pendChain size + 1 is equal to last jacobsthal number, inserting straggler into pendChain: " << straggler << std::endl;
 		hasStraggler = false;
 		pendChain.push_back(straggler);
 	}
+	std::cout << "pendChain after possibly inserting straggler: "  << std::endl;
+	printContainer(pendChain);
 	std::vector<ElementInfo> mainChain = mergeInsertElements(
 			sortedLarger, pendChain, jacobsthalNumbers);
 	if (hasStraggler)
 	{
+		std::cout << "hasStraggler is true, inserting straggler into mainChain" << straggler << std::endl;
 		std::vector<ElementInfo>::iterator insertionPoint = std::lower_bound(
 				mainChain.begin(), mainChain.end(),
 				straggler);
