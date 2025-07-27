@@ -2,7 +2,6 @@
 #include "Debug.hpp"
 #include <algorithm>
 #include <limits>
-#include <stdexcept>
 #include <vector>
 
 size_t PmergeMe::comparisonCount = 0;
@@ -13,12 +12,6 @@ PmergeMe::PmergeMe( void )
 {
 	debug("Default Constructor called");
 }
-
-// Parameterized Constructor
-// PmergeMe::PmergeMe( std::string value )
-// {
-// 	debug("Parameterized Constructor called");
-// }
 
 // Destructor
 PmergeMe::~PmergeMe()
@@ -136,16 +129,12 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::fordJohnsonSort( std::vector<Elemen
 	bool		hasStraggler = (elements.size() % 2 == 1);
 	if (hasStraggler)
 	{
-		if (elementsIndex  + 1 != elements.size())
-			throw std::logic_error("elementsIndex when detected a straggler is not the last element");
 		// set with marker sizemax to mark straggler inside chain
 		straggler.value = elements.back().value;
 		straggler.originalIndex = std::numeric_limits<size_t>::max();
 		straggler.previousIndex = elements.back().originalIndex;
 		elements.pop_back();
 	}
-	if (elements.size() / 2 != largerElements.size())
-		throw std::logic_error("Size mismatch");
 	std::vector<ElementInfo> sortedLarger = fordJohnsonSort(largerElements);
 
 	std::vector<ElementInfo> pendChain;
@@ -155,8 +144,6 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::fordJohnsonSort( std::vector<Elemen
 		sortedLarger[i] = (elements[sortedLarger[i].previousIndex]);
 		pendChain.push_back(elements[sortedLarger[i].originalIndex - 1]);
 	}
-	if (pendChain.size() == 0)
-		throw std::logic_error("pendChain is empty, but should not be");
 	std::vector<size_t> jacobsthalNumbers = generateJacobsthalNumbers(pendChain.size() + 2);
 	// if straggler index is present in jacobsthal numbers, can insert it in regular mergeInsertElements, else do insertion at end
 	if (hasStraggler && pendChain.size() == jacobsthalNumbers.back() - 1)
