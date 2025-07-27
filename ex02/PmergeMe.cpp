@@ -90,22 +90,22 @@ PmergeMe& PmergeMe::operator=( const PmergeMe &assign )
 // 		return ;
 // }
 
-std::vector<size_t>	PmergeMe::generateJacobsthalNumbers(size_t n)
+std::vector<size_t>	PmergeMe::generateJacobsthalNumbers(size_t tillAtLeast)
 {
 	std::vector<size_t>	sequence;
-	sequence.reserve(n);
+	sequence.reserve(tillAtLeast);
 	sequence.push_back(1);
-	if (n == 1)
+	if (tillAtLeast == 1)
 		return (sequence);
 	sequence.push_back(1);
 	size_t	a = 1;
 	size_t	b = 1;
-	for (size_t i = 2; i < n; i++)
+	while (1)
 	{
 		size_t next = b + 2 * a;
-		if (next > n)
-			break ;
 		sequence.push_back(next);
+		if (next > tillAtLeast)
+			break ;
 		a = b;
 		b = next;
 	}
