@@ -72,6 +72,7 @@ class PmergeMe {
 		static std::vector<ElementInfo>	fordJohnsonSort( std::vector<ElementInfo> &vec );
 		static std::vector<PmergeMe::ElementInfo>	mergeInsertElements(
 				const std::vector<ElementInfo>& lookupSortedSequence, const std::vector<ElementInfo>& pendChain, std::vector<size_t> JacobsthalNumbers);
+		static std::vector<PmergeMe::ElementInfo> pairAndExtract( std::vector<ElementInfo> &elements);
 };
 
 std::ostream& operator<<(std::ostream& os, const PmergeMe::ElementInfo& info);
