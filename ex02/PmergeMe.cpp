@@ -112,29 +112,29 @@ std::vector<size_t>	PmergeMe::generateJacobsthalNumbers(size_t n)
 	return (sequence);
 }
 
-std::vector<size_t> PmergeMe::generateInsertionOrder(size_t pendSize)
-{
-	if (pendSize == 0)
-		return (std::vector<size_t>(0));
-	std::vector<size_t> insertionOrder;
-	std::vector<size_t> jacobsthal = generateJacobsthalNumbers(pendSize);
-	insertionOrder.push_back(0);
-	if (pendSize == 1)
-		return (insertionOrder);
-	size_t	previousJacob = 1;
-	for (size_t i = 1; i < jacobsthal.size(); i++)
-	{
-		size_t	currentJacob = jacobsthal[i];
-		if (jacobsthal[i] > pendSize)
-			currentJacob = pendSize;
-		for (size_t j = currentJacob; j > previousJacob; j--)
-			insertionOrder.push_back(j - 1);
-		previousJacob = currentJacob;
-		if (currentJacob >= pendSize)
-			break;
-	}
-	return (insertionOrder);
-}
+// std::vector<size_t> PmergeMe::generateInsertionOrder(size_t pendSize)
+// {
+// 	if (pendSize == 0)
+// 		return (std::vector<size_t>(0));
+// 	std::vector<size_t> insertionOrder;
+// 	std::vector<size_t> jacobsthal = generateJacobsthalNumbers(pendSize);
+// 	insertionOrder.push_back(0);
+// 	if (pendSize == 1)
+// 		return (insertionOrder);
+// 	size_t	previousJacob = 1;
+// 	for (size_t i = 1; i < jacobsthal.size(); i++)
+// 	{
+// 		size_t	currentJacob = jacobsthal[i];
+// 		if (jacobsthal[i] > pendSize)
+// 			currentJacob = pendSize;
+// 		for (size_t j = currentJacob; j > previousJacob; j--)
+// 			insertionOrder.push_back(j - 1);
+// 		previousJacob = currentJacob;
+// 		if (currentJacob >= pendSize)
+// 			break;
+// 	}
+// 	return (insertionOrder);
+// }
 
 //mergeInsertion with jacobsthal numbers
 std::vector<PmergeMe::ElementInfo>	PmergeMe::mergeInsertElements(
@@ -145,33 +145,40 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::mergeInsertElements(
 	if (pendChain.size() == 1)
 		return (mainChain);
 	size_t previousJacob = 1;
-	for (size_t i = 1; i < pendChain.size(); i++)
+	std::cout << "mainChain after inserting first element: " << std::endl;
+	printContainer(mainChain);
+	for (size_t i = 2; i < jacobsthalNumbers.size(); i++)
 	{
-		size_t currentJacob = jacobsthalNumbers[i];
+		size_t currentJacob = jacobsthalNumbers[i] < pendChain.size()
+			? jacobsthalNumbers[i] : pendChain.size();
 		for (size_t j = currentJacob; j > previousJacob; j--)
 		{
 			const ElementInfo& elemToInsert = pendChain[j - 1];
-			// find position of large Element in main chain, that is partner to
-			// currently to insert small element and save it in upperBound
-			size_t upperBound = mainChain.size();
+			size_t bound = mainChain.size();
 			if (j - 1 < lookupSortedSequence.size())
 			{
+				std::cout << "Looking for bound for element: " << elemToInsert << std::endl;
+				std::cout << "Partner Element from mainChain: " << lookupSortedSequence[pendChain[j - 1].originalIndex + 1] << std::endl;
 				for (size_t k = 0; k < mainChain.size(); k++)
 				{
-					if (mainChain[k].value == lookupSortedSequence[j - 1].value
-						&& mainChain[k].originalIndex == lookupSortedSequence[j - 1].originalIndex)
+					if (lookupSortedSequence[pendChain[j - 1].originalIndex + 1].value == mainChain[k].value)
 					{
-						upperBound = k;
+						bound = k;
 						break;
 					}
 				}
 			}
 			//binary search within bounded range
+			std::cout << "Inserting element: " << elemToInsert << " with lower_bound at index: " << bound << std::endl;
+			std::cout << "Element at upperBound in mainChain: " << mainChain[bound] << std::endl;
 			std::vector<ElementInfo>::iterator insertionPoint = std::lower_bound(
-					mainChain.begin(), mainChain.begin() + upperBound,
+					mainChain.begin(), mainChain.begin() + bound,
 					elemToInsert);
 			mainChain.insert(insertionPoint, elemToInsert);
 			previousJacob = currentJacob;
+			std::cout << "mainChain after insertion: " << std::endl;
+			printContainer(mainChain);
+			std::cout << "--------------------"  << std::endl;
 		}
 	}
 	return (mainChain);
