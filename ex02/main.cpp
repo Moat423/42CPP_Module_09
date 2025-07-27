@@ -16,7 +16,8 @@ int main (int argc, char *argv[])
 	int					input;
 	long				linput;
 	char				*endptr;
-	double					time;
+	double				time;
+	size_t				size;
 	std::vector<int>	vec;
 	std::deque<int>		deq;
 	for (int i = 1; argv[i] != NULL; i++)
@@ -34,6 +35,7 @@ int main (int argc, char *argv[])
 		vec.push_back(input);
 		deq.push_back(input);
 	}
+	size = vec.size();
 	std::cout << YEL << "Before: " << RESET;
 	printContainer(vec);
 	// PmergeMe pm;
@@ -44,6 +46,11 @@ int main (int argc, char *argv[])
 	std::cout << std::fixed << std::setprecision(5) << "Time taken: " << time * 1000.0 << " ms" << std::endl;
 	std::cout << YEL << "After:  " << RESET;
 	printContainer(vec);
+	std::cout << "size is same? ";
+	if (vec.size() == size)
+		std::cout << GREEN << "yes" << RESET << std::endl;
+	else
+		std::cout << RED << "no" << RESET << std::endl;
 	std::cout << "is sorted: ";
 	if (is_sorted(vec.begin(), vec.end()))
 		std::cout << GREEN << "yes" << RESET << std::endl;

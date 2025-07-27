@@ -144,24 +144,27 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::mergeInsertElements(
 	mainChain.insert(mainChain.begin(), pendChain[0]);
 	if (pendChain.size() == 1)
 		return (mainChain);
-	size_t previousJacob = 1;
+	size_t previousJacob = 0;
 	std::cout << "mainChain after inserting first element: " << std::endl;
 	printContainer(mainChain);
-	for (size_t i = 2; i < jacobsthalNumbers.size(); i++)
+	for (size_t jacobsIndex = 2; jacobsIndex < jacobsthalNumbers.size(); jacobsIndex++)
 	{
-		size_t currentJacob = jacobsthalNumbers[i] < pendChain.size()
-			? jacobsthalNumbers[i] : pendChain.size();
-		for (size_t j = currentJacob; j > previousJacob; j--)
+		size_t currentJacob = (jacobsthalNumbers[jacobsIndex] - 1 ) < pendChain.size() - 1
+			? (jacobsthalNumbers[jacobsIndex] - 1) : pendChain.size() - 1;
+		std::cout << "currentJacob: " << currentJacob << std::endl;
+		std::cout << "previousJacob: " << previousJacob << std::endl;
+		for (size_t pendChainIndexToInsert = currentJacob; pendChainIndexToInsert > previousJacob; pendChainIndexToInsert--)
 		{
-			const ElementInfo& elemToInsert = pendChain[j - 1];
+			std::cout << "Inserting element at pendChainIndexToInsert: " << pendChainIndexToInsert << std::endl;
+			const ElementInfo& elemToInsert = pendChain[pendChainIndexToInsert];
 			size_t bound = mainChain.size();
-			if (j - 1 < lookupSortedSequence.size())
+			if (pendChainIndexToInsert < lookupSortedSequence.size())
 			{
 				std::cout << "Looking for bound for element: " << elemToInsert << std::endl;
-				std::cout << "Partner Element from mainChain: " << lookupSortedSequence[pendChain[j - 1].originalIndex + 1] << std::endl;
+				std::cout << "Partner Element from mainChain: " << lookupSortedSequence[pendChainIndexToInsert] << std::endl;
 				for (size_t k = 0; k < mainChain.size(); k++)
 				{
-					if (lookupSortedSequence[pendChain[j - 1].originalIndex + 1].value == mainChain[k].value)
+					if (lookupSortedSequence[pendChainIndexToInsert].value == mainChain[k].value)
 					{
 						bound = k;
 						break;
@@ -175,11 +178,11 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::mergeInsertElements(
 					mainChain.begin(), mainChain.begin() + bound,
 					elemToInsert);
 			mainChain.insert(insertionPoint, elemToInsert);
-			previousJacob = currentJacob;
 			std::cout << "mainChain after insertion: " << std::endl;
 			printContainer(mainChain);
 			std::cout << "--------------------"  << std::endl;
 		}
+		previousJacob = currentJacob;
 	}
 	return (mainChain);
 }
