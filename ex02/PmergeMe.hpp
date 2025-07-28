@@ -69,7 +69,7 @@ class PmergeMe {
 		} ElementInfo;
 	private:
 		static std::vector<size_t>	generateJacobsthalNumbers(size_t n);
-		static std::vector<ElementInfo>	fordJohnsonSort( std::vector<ElementInfo> &vec );
+		static std::vector<ElementInfo>	fordJohnsonSort( const std::vector<ElementInfo> &vec );
 		static std::vector<PmergeMe::ElementInfo>	mergeInsertElements(
 				const std::vector<ElementInfo>& lookupSortedSequence, const std::vector<ElementInfo>& pendChain, std::vector<size_t> JacobsthalNumbers);
 		static std::vector<PmergeMe::ElementInfo> pairAndExtract( std::vector<ElementInfo> &elements);

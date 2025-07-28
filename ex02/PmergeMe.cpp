@@ -100,7 +100,7 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::mergeInsertElements(
 	return (mainChain);
 }
 
-std::vector<PmergeMe::ElementInfo>	PmergeMe::fordJohnsonSort( std::vector<ElementInfo> &vec)
+std::vector<PmergeMe::ElementInfo>	PmergeMe::fordJohnsonSort(const std::vector<ElementInfo> &vec)
 {
 	std::vector<ElementInfo> elements = vec;
 	if (elements.size() <= 1)
