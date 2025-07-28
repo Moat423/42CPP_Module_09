@@ -100,6 +100,15 @@ the list will have its value and a pointer to its smaller pair. The overload for
 There will be a largeElement list that i won't modify unlike the main
 if we have a pointer, then in the insertion stage, we instantly know the lower_bound.
 
+The way i am looking for the correct element to bound in by binary search in the insertion stage is not optimal. I can not follow the element by reeking a reference to it, that would be ideal, but only possible on lists. I thought of counting how many times i must have inserted before the element and adding that to the original position (+ 1, because i insert one before it for sure at the beginning).
+```c++
+
+				boundaries.back() = pendChainIndexToInsert + 1;
+				for (size_t boundaryIndex = 0; boundaryIndex < boundaries.size() ; boundaryIndex++)
+					boundaries.back() += 1 & (boundaries[boundaryIndex] <= boundaries.back());
+```
+but i think i still have some logic error in that. So as of now, I am sticking with what works, although I know, that technically, it is very stupid, cause if i am already looking through the elements, i could have sorted it by now.
+
 #### example sorting
 
 from code with these print statements to see what is going on:

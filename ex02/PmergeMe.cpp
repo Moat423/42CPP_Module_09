@@ -67,8 +67,8 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::mergeInsertElements(
 	if (pendChain.size() == 1)
 		return (mainChain);
 	size_t previousJacob = 0;
-	// std::vector<size_t> boundaries;
-	// boundaries.reserve(pendChain.size());
+	std::vector<size_t> boundaries;
+	boundaries.reserve(pendChain.size());
 	for (size_t jacobsIndex = 2; jacobsIndex < jacobsthalNumbers.size(); jacobsIndex++)
 	{
 		size_t currentJacob = (jacobsthalNumbers[jacobsIndex] - 1 ) < pendChain.size() - 1
@@ -77,32 +77,32 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::mergeInsertElements(
 		{
 			const ElementInfo& elemToInsert = pendChain[pendChainIndexToInsert];
 			// inserting an element from pendChain into mainChain. if pendChainIndexToInsert is out of bounds, it is a straggler
-			size_t bound = mainChain.size();
-			// boundaries.push_back(mainChain.size());
+			// size_t bound = mainChain.size();
+			boundaries.push_back(mainChain.size());
 			if (pendChainIndexToInsert < lookupSortedSequence.size())
 			{
 				std::cout << "Looking for bound for element: " << elemToInsert << std::endl;
 				std::cout << "Partner Element from mainChain: " << lookupSortedSequence[pendChainIndexToInsert] << std::endl;
 				std::cout << "pendChainIndexToInsert: " << pendChainIndexToInsert << std::endl;
-				// boundaries.back() = lookupSortedSequence[pendChainIndexToInsert].originalIndex;
-				// for (size_t boundaryIndex = 0; boundaryIndex < boundaries.size() - 1; boundaryIndex++)
-				// {
-				// 	boundaries.back() += 1 & (boundaries[boundaryIndex] < boundaries.back());
-				// }
+				boundaries.back() = pendChainIndexToInsert + 1;
+				for (size_t boundaryIndex = 0; boundaryIndex < boundaries.size() ; boundaryIndex++)
+				{
+					boundaries.back() += 1 & (boundaries[boundaryIndex] <= boundaries.back());
+				}
 				// have to know at what point the elements to inserts partner is in main chain, so i only search up to that point.
 				// can make this better, by making vec of previous insertion points and adding them up to pendChainIndexToInsert if they are lower step by step
-				for (size_t k = 0; k < mainChain.size(); k++)
-				{
-					if (lookupSortedSequence[pendChainIndexToInsert].value == mainChain[k].value)
-					{
-						bound = k;
-						break;
-					}
-				}
-				std::cout << "Element at upperBound in mainChain: " << mainChain[bound] << std::endl;
-				std::cout << "Bound index: " << bound << std::endl;
-				// std::cout << "Element at upperBound in mainChain: " << mainChain[boundaries.back()] << std::endl;
-				// std::cout << "Bound index: " << boundaries.back() << std::endl;
+				// for (size_t k = 0; k < mainChain.size(); k++)
+				// {
+				// 	if (lookupSortedSequence[pendChainIndexToInsert].value == mainChain[k].value)
+				// 	{
+				// 		bound = k;
+				// 		break;
+				// 	}
+				// }
+				// std::cout << "Element at upperBound in mainChain: " << mainChain[bound] << std::endl;
+				// std::cout << "Bound index: " << bound << std::endl;
+				std::cout << "Element at upperBound in mainChain: " << mainChain[boundaries.back()] << std::endl;
+				std::cout << "Bound index: " << boundaries.back() << std::endl;
 			}
 			else
 			{
@@ -110,7 +110,7 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::mergeInsertElements(
 			}
 			//binary search within bounded range
 			std::vector<ElementInfo>::iterator insertionPoint = std::lower_bound(
-					mainChain.begin(), mainChain.begin() + bound,
+					mainChain.begin(), mainChain.begin() + boundaries.back(),
 					elemToInsert);
 			mainChain.insert(insertionPoint, elemToInsert);
 		}
