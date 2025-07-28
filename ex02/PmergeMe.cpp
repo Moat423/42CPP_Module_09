@@ -204,6 +204,8 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::mergeInsertElements(
 	if (pendChain.size() == 1)
 		return (mainChain);
 	size_t previousJacob = 0;
+	std::vector<std::vector<ElementInfo>::iterator> allInsertionPoints;
+	allInsertionPoints.reserve(pendChain.size() - 1);
 	for (size_t jacobsIndex = 2; jacobsIndex < jacobsthalNumbers.size(); jacobsIndex++)
 	{
 		size_t currentJacob = (jacobsthalNumbers[jacobsIndex] - 1 ) < pendChain.size() - 1
@@ -212,24 +214,19 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::mergeInsertElements(
 		{
 			const ElementInfo& elemToInsert = pendChain[pendChainIndexToInsert];
 			// inserting an element from pendChain into mainChain. if pendChainIndexToInsert is out of bounds, it is a straggler
-			size_t bound = mainChain.size();
+			allInsertionPoints.push_back(mainChain.end());
 			if (pendChainIndexToInsert < lookupSortedSequence.size())
 			{
-				// have to know at what point the elements to inserts partner is in main chain, so i only search up to that point.
-				for (size_t k = 0; k < mainChain.size(); k++)
-				{
-					if (lookupSortedSequence[pendChainIndexToInsert].value == mainChain[k].value)
-					{
-						bound = k;
-						break;
-					}
-				}
+				allInsertionPoints.back() = mainChain.begin() + pendChainIndexToInsert + 1;
+				for (std::vector<ElementInfo>::iterator InsertionPointIt = mainChain.begin(); InsertionPointIt != mainChain.end() - 1 ; InsertionPointIt++)
+					allInsertionPoints.back() += 1 & (*InsertionPointIt < *allInsertionPoints.back());
 			}
 			//binary search within bounded range
 			std::vector<ElementInfo>::iterator insertionPoint = std::lower_bound(
-					mainChain.begin(), mainChain.begin() + bound,
+					mainChain.begin(), allInsertionPoints.back(),
 					elemToInsert);
 			mainChain.insert(insertionPoint, elemToInsert);
+			allInsertionPoints.push_back(insertionPoint);
 		}
 		previousJacob = currentJacob;
 	}

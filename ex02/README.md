@@ -103,11 +103,11 @@ if we have a pointer, then in the insertion stage, we instantly know the lower_b
 The way i am looking for the correct element to bound in by binary search in the insertion stage is not optimal. I can not follow the element by reeking a reference to it, that would be ideal, but only possible on lists. I thought of counting how many times i must have inserted before the element and adding that to the original position (+ 1, because i insert one before it for sure at the beginning).
 ```c++
 
-				boundaries.back() = pendChainIndexToInsert + 1;
-				for (size_t boundaryIndex = 0; boundaryIndex < boundaries.size() ; boundaryIndex++)
-					boundaries.back() += 1 & (boundaries[boundaryIndex] <= boundaries.back());
+				allInsertionPoints.back() = mainChain.begin() + pendChainIndexToInsert + 1;
+				for (std::vector<ElementInfo>::iterator InsertionPointIt = mainChain.begin(); InsertionPointIt != mainChain.end() - 1 ; InsertionPointIt++)
+					allInsertionPoints.back() += 1 & (*InsertionPointIt < *allInsertionPoints.back());
 ```
-but this is actually never going to work, because just by knowing that i previously searched UP TO a number, doesn't mean i know, if it maybe wasn't inserted BEFORE that number. So i have to add them all up, but then i will miss cases in which the number was in actually inserted behind my current partner number to the pendChain Number i want to insert. So no way around it, unless i do lists.
+and this will work, because the insertion point i am using is the one returned from the binary search.
 
 #### example sorting
 
