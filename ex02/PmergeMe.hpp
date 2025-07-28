@@ -51,6 +51,7 @@ class PmergeMe {
 		PmergeMe& operator=( const PmergeMe &assign );
 		//methods
 		static void	mergeInsertionSortVec( std::vector<int> &vec);
+		static void	mergeInsertionSortDeq( std::deque<int> &vec);
 
 		//variables
 		static size_t	comparisonCount;
@@ -69,6 +70,11 @@ class PmergeMe {
 		} ElementInfo;
 	private:
 		static const std::deque<size_t>generateJacobsthalNumbersDeque(size_t n);
+		static std::deque<PmergeMe::ElementInfo>	mergeInsertElementsDeque(
+				const std::deque<ElementInfo>& lookupSortedSequence, const std::deque<ElementInfo>& pendChain, std::deque<size_t> jacobsthalNumbers);
+		static std::deque<PmergeMe::ElementInfo>	pairAndExtractDeque( std::deque<ElementInfo> &elements);
+		static std::deque<PmergeMe::ElementInfo>	fordJohnsonSortDeque(const std::deque<ElementInfo> &vec);
+
 		static const std::vector<size_t>	generateJacobsthalNumbers(size_t n);
 		static std::vector<ElementInfo>	fordJohnsonSort( const std::vector<ElementInfo> &vec );
 		static std::vector<PmergeMe::ElementInfo>	mergeInsertElements(

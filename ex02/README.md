@@ -107,7 +107,7 @@ The way i am looking for the correct element to bound in by binary search in the
 				for (size_t boundaryIndex = 0; boundaryIndex < boundaries.size() ; boundaryIndex++)
 					boundaries.back() += 1 & (boundaries[boundaryIndex] <= boundaries.back());
 ```
-but i think i still have some logic error in that. So as of now, I am sticking with what works, although I know, that technically, it is very stupid, cause if i am already looking through the elements, i could have sorted it by now.
+but this is actually never going to work, because just by knowing that i previously searched UP TO a number, doesn't mean i know, if it maybe wasn't inserted BEFORE that number. So i have to add them all up, but then i will miss cases in which the number was in actually inserted behind my current partner number to the pendChain Number i want to insert. So no way around it, unless i do lists.
 
 #### example sorting
 

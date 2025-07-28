@@ -46,16 +46,22 @@ int main (int argc, char *argv[])
 	std::cout << std::fixed << std::setprecision(5) << "Time to process a range of "
 		<< size << " elements with std::vector<int> : "
 		<< time * 1000.0 << " ms" << std::endl;
+	// std::cout << "comparison count: " << PmergeMe::comparisonCount << std::endl;
+	// PmergeMe::comparisonCount = 0;
+	time = stopwatch(PmergeMe::mergeInsertionSortDeq, deq);
+	std::cout << std::fixed << std::setprecision(5) << "Time to process a range of "
+		<< size << " elements with std::vector<int> : "
+		<< time * 1000.0 << " ms" << std::endl;
+	std::cout << "comparison count: " << PmergeMe::comparisonCount << std::endl;
 	std::cout << "size is same? ";
-	if (vec.size() == size)
+	if (vec.size() == size && deq.size() == size)
 		std::cout << GREEN << "yes" << RESET << std::endl;
 	else
 		std::cout << RED << "no" << RESET << std::endl;
 	std::cout << "is sorted: ";
-	if (is_sorted(vec.begin(), vec.end()))
+	if (is_sorted(vec.begin(), vec.end()) && is_sorted(deq.begin(), deq.end()))
 		std::cout << GREEN << "yes" << RESET << std::endl;
 	else
 		std::cout << RED << "no" << RESET << std::endl;
-	std::cout << "comparison count: " << PmergeMe::comparisonCount << std::endl;
 	return 0;
 }

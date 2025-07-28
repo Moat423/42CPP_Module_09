@@ -57,6 +57,121 @@ const std::deque<size_t>	PmergeMe::generateJacobsthalNumbersDeque(size_t tillAtL
 	return (sequence);
 }
 
+std::deque<PmergeMe::ElementInfo>	PmergeMe::mergeInsertElementsDeque(
+		const std::deque<ElementInfo>& lookupSortedSequence, const std::deque<ElementInfo>& pendChain, std::deque<size_t> jacobsthalNumbers)
+{
+	std::deque<ElementInfo> mainChain = lookupSortedSequence;
+	mainChain.insert(mainChain.begin(), pendChain[0]);
+	if (pendChain.size() == 1)
+		return (mainChain);
+	size_t previousJacob = 0;
+	for (size_t jacobsIndex = 2; jacobsIndex < jacobsthalNumbers.size(); jacobsIndex++)
+	{
+		size_t currentJacob = (jacobsthalNumbers[jacobsIndex] - 1 ) < pendChain.size() - 1
+			? (jacobsthalNumbers[jacobsIndex] - 1) : pendChain.size() - 1;
+		for (size_t pendChainIndexToInsert = currentJacob; pendChainIndexToInsert > previousJacob; pendChainIndexToInsert--)
+		{
+			const ElementInfo& elemToInsert = pendChain[pendChainIndexToInsert];
+			size_t bound = mainChain.size();
+			if (pendChainIndexToInsert < lookupSortedSequence.size())
+			{
+				for (size_t k = 0; k < mainChain.size(); k++)
+				{
+					if (lookupSortedSequence[pendChainIndexToInsert].value == mainChain[k].value)
+					{
+						bound = k;
+						break;
+					}
+				}
+			}
+			std::deque<ElementInfo>::iterator insertionPoint = std::lower_bound(
+					mainChain.begin(), mainChain.begin() + bound,
+					elemToInsert);
+			mainChain.insert(insertionPoint, elemToInsert);
+		}
+		previousJacob = currentJacob;
+	}
+	return (mainChain);
+}
+
+std::deque<PmergeMe::ElementInfo>	PmergeMe::pairAndExtractDeque( std::deque<ElementInfo> &elements)
+{
+	std::deque<ElementInfo> largerElements;
+	size_t	elementsIndex = 0;
+	while (elementsIndex < elements.size() && elementsIndex + 1 < elements.size())
+	{
+		if (elements[elementsIndex] > elements[elementsIndex + 1])
+			std::swap(elements[elementsIndex], elements[elementsIndex + 1]);
+		elements[elementsIndex].previousIndex = elements[elementsIndex].originalIndex;
+		elements[elementsIndex].originalIndex = elementsIndex;
+		elements[elementsIndex + 1].previousIndex = elements[elementsIndex + 1].originalIndex;
+		elements[elementsIndex + 1].originalIndex = elementsIndex + 1;
+		largerElements.push_back(elements[elementsIndex + 1]);
+		elementsIndex += 2;
+	}
+	return largerElements;
+}
+
+std::deque<PmergeMe::ElementInfo>	PmergeMe::fordJohnsonSortDeque(const std::deque<ElementInfo> &vec)
+{
+	std::deque<ElementInfo> elements = vec;
+	if (elements.size() <= 1)
+	{
+		elements[0].previousIndex = elements[0].originalIndex;
+		elements[0].originalIndex = 0;
+		return (elements);
+	}
+	std::deque<ElementInfo> largerElements = pairAndExtractDeque(elements);
+	ElementInfo	straggler;
+	bool		hasStraggler = (elements.size() % 2 == 1);
+	if (hasStraggler)
+	{
+		straggler.value = elements.back().value;
+		straggler.originalIndex = std::numeric_limits<size_t>::max();
+		straggler.previousIndex = elements.back().originalIndex;
+		elements.pop_back();
+	}
+	std::deque<ElementInfo> sortedLarger = fordJohnsonSortDeque(largerElements);
+	std::deque<ElementInfo> pendChain;
+	for (size_t i = 0; i < sortedLarger.size(); i++)
+	{
+		sortedLarger[i] = (elements[sortedLarger[i].previousIndex]);
+		pendChain.push_back(elements[sortedLarger[i].originalIndex - 1]);
+	}
+	const std::deque<size_t> jacobsthalNumbers = generateJacobsthalNumbersDeque(pendChain.size() + 2);
+	if (hasStraggler && pendChain.size() == jacobsthalNumbers.back() - 1)
+	{
+		hasStraggler = false;
+		pendChain.push_back(straggler);
+	}
+	std::deque<ElementInfo> mainChain = mergeInsertElementsDeque(
+			sortedLarger, pendChain, jacobsthalNumbers);
+	if (hasStraggler)
+	{
+		std::deque<ElementInfo>::iterator insertionPoint = std::lower_bound(
+				mainChain.begin(), mainChain.end(),
+				straggler);
+		mainChain.insert(insertionPoint, straggler);
+	}
+	return mainChain;
+}
+
+void	PmergeMe::mergeInsertionSortDeq( std::deque<int> &vec)
+{
+	if (vec.size() <= 1)
+		return;
+	std::deque<ElementInfo> elements;
+	for (size_t i = 0; i < vec.size(); i++)
+	{
+		ElementInfo e ={vec[i], i, std::numeric_limits<size_t>::max()};
+		elements.push_back(e);
+	}
+	std::deque<ElementInfo> sorted = fordJohnsonSortDeque(elements);
+	vec.clear();
+	for (size_t i = 0; i < sorted.size(); i++)
+		vec.push_back(sorted[i].value);
+}
+
 const std::vector<size_t>	PmergeMe::generateJacobsthalNumbers(size_t tillAtLeast)
 {
 	std::vector<size_t>	sequence;
@@ -89,8 +204,6 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::mergeInsertElements(
 	if (pendChain.size() == 1)
 		return (mainChain);
 	size_t previousJacob = 0;
-	std::vector<size_t> boundaries;
-	boundaries.reserve(pendChain.size());
 	for (size_t jacobsIndex = 2; jacobsIndex < jacobsthalNumbers.size(); jacobsIndex++)
 	{
 		size_t currentJacob = (jacobsthalNumbers[jacobsIndex] - 1 ) < pendChain.size() - 1
@@ -99,38 +212,22 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::mergeInsertElements(
 		{
 			const ElementInfo& elemToInsert = pendChain[pendChainIndexToInsert];
 			// inserting an element from pendChain into mainChain. if pendChainIndexToInsert is out of bounds, it is a straggler
-			// size_t bound = mainChain.size();
-			boundaries.push_back(mainChain.size());
+			size_t bound = mainChain.size();
 			if (pendChainIndexToInsert < lookupSortedSequence.size())
 			{
-				std::cout << "Looking for bound for element: " << elemToInsert << std::endl;
-				std::cout << "Partner Element from mainChain: " << lookupSortedSequence[pendChainIndexToInsert] << std::endl;
-				std::cout << "pendChainIndexToInsert: " << pendChainIndexToInsert << std::endl;
-				boundaries.back() = pendChainIndexToInsert + 1;
-				for (size_t boundaryIndex = 0; boundaryIndex < boundaries.size() ; boundaryIndex++)
-					boundaries.back() += 1 & (boundaries[boundaryIndex] <= boundaries.back());
 				// have to know at what point the elements to inserts partner is in main chain, so i only search up to that point.
-				// can make this better, by making vec of previous insertion points and adding them up to pendChainIndexToInsert if they are lower step by step
-				// for (size_t k = 0; k < mainChain.size(); k++)
-				// {
-				// 	if (lookupSortedSequence[pendChainIndexToInsert].value == mainChain[k].value)
-				// 	{
-				// 		bound = k;
-				// 		break;
-				// 	}
-				// }
-				// std::cout << "Element at upperBound in mainChain: " << mainChain[bound] << std::endl;
-				// std::cout << "Bound index: " << bound << std::endl;
-				std::cout << "Element at upperBound in mainChain: " << mainChain[boundaries.back()] << std::endl;
-				std::cout << "Bound index: " << boundaries.back() << std::endl;
-			}
-			else
-			{
-				std::cout << "pendChainIndexToInsert is out of bounds for lookupSortedSequence because it is STRAGGLER, using mainChain size as bound" << std::endl;
+				for (size_t k = 0; k < mainChain.size(); k++)
+				{
+					if (lookupSortedSequence[pendChainIndexToInsert].value == mainChain[k].value)
+					{
+						bound = k;
+						break;
+					}
+				}
 			}
 			//binary search within bounded range
 			std::vector<ElementInfo>::iterator insertionPoint = std::lower_bound(
-					mainChain.begin(), mainChain.begin() + boundaries.back(),
+					mainChain.begin(), mainChain.begin() + bound,
 					elemToInsert);
 			mainChain.insert(insertionPoint, elemToInsert);
 		}
