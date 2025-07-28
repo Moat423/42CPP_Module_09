@@ -41,11 +41,11 @@ int main (int argc, char *argv[])
 	std::cout << YEL << "Before: " << RESET;
 	printContainer(vec);
 	std::cout << YEL << "After:  " << RESET;
+	printContainer(vec);
 	time = stopwatch(PmergeMe::mergeInsertionSortVec, vec);
 	std::cout << std::fixed << std::setprecision(5) << "Time to process a range of "
 		<< size << " elements with std::vector<int> : "
 		<< time * 1000.0 << " ms" << std::endl;
-	printContainer(vec);
 	std::cout << "size is same? ";
 	if (vec.size() == size)
 		std::cout << GREEN << "yes" << RESET << std::endl;
