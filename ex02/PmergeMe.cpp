@@ -1,6 +1,7 @@
 #include "PmergeMe.hpp"
 #include "Debug.hpp"
 #include <algorithm>
+#include <deque>
 #include <limits>
 #include <vector>
 
@@ -35,7 +36,28 @@ PmergeMe& PmergeMe::operator=( const PmergeMe &assign )
 	return (*this);
 }
 
-std::vector<size_t>	PmergeMe::generateJacobsthalNumbers(size_t tillAtLeast)
+const std::deque<size_t>	PmergeMe::generateJacobsthalNumbersDeque(size_t tillAtLeast)
+{
+	std::deque<size_t>	sequence;
+	sequence.push_back(1);
+	if (tillAtLeast == 1)
+		return (sequence);
+	sequence.push_back(1);
+	size_t	a = 1;
+	size_t	b = 1;
+	while (1)
+	{
+		size_t next = b + 2 * a;
+		sequence.push_back(next);
+		if (next > tillAtLeast)
+			break ;
+		a = b;
+		b = next;
+	}
+	return (sequence);
+}
+
+const std::vector<size_t>	PmergeMe::generateJacobsthalNumbers(size_t tillAtLeast)
 {
 	std::vector<size_t>	sequence;
 	sequence.reserve(tillAtLeast);
@@ -86,9 +108,7 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::mergeInsertElements(
 				std::cout << "pendChainIndexToInsert: " << pendChainIndexToInsert << std::endl;
 				boundaries.back() = pendChainIndexToInsert + 1;
 				for (size_t boundaryIndex = 0; boundaryIndex < boundaries.size() ; boundaryIndex++)
-				{
 					boundaries.back() += 1 & (boundaries[boundaryIndex] <= boundaries.back());
-				}
 				// have to know at what point the elements to inserts partner is in main chain, so i only search up to that point.
 				// can make this better, by making vec of previous insertion points and adding them up to pendChainIndexToInsert if they are lower step by step
 				// for (size_t k = 0; k < mainChain.size(); k++)

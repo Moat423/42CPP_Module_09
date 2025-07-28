@@ -68,7 +68,8 @@ class PmergeMe {
 			bool operator>( const PmergeMe::ElementInfo &other ) const;
 		} ElementInfo;
 	private:
-		static std::vector<size_t>	generateJacobsthalNumbers(size_t n);
+		static const std::deque<size_t>generateJacobsthalNumbersDeque(size_t n);
+		static const std::vector<size_t>	generateJacobsthalNumbers(size_t n);
 		static std::vector<ElementInfo>	fordJohnsonSort( const std::vector<ElementInfo> &vec );
 		static std::vector<PmergeMe::ElementInfo>	mergeInsertElements(
 				const std::vector<ElementInfo>& lookupSortedSequence, const std::vector<ElementInfo>& pendChain, std::vector<size_t> JacobsthalNumbers);
