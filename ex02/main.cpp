@@ -24,12 +24,14 @@ int main (int argc, char *argv[])
 	{
 		linput = strtol(argv[i], &endptr, 10);
 		if (*endptr == 0 && linput >= std::numeric_limits<int>::min()
-			&& linput <= static_cast<float>(std::numeric_limits<int>::max()))
+			&& linput <= static_cast<float>(std::numeric_limits<int>::max())
+			&& linput >= 0)
 			input = static_cast<int>(linput);
 		else
 		{
-			std::cout << "Usage: ./PmergeMe 2 4 3 7 9" << std::endl;
-			std::cout << "Remark: please don't mix quotes in there" << std::endl;
+			std::cout << "Usage: ./PemergeMe <sequence of positive int numbers>" << std::endl;
+			std::cout << "e.g. ./PmergeMe 2 4 3 7 9" << std::endl;
+			std::cout << "Remark: please don't mix quotes in there, also, program accepts only positive numbers" << std::endl;
 			return (1);
 		}
 		vec.push_back(input);
@@ -38,13 +40,11 @@ int main (int argc, char *argv[])
 	size = vec.size();
 	std::cout << YEL << "Before: " << RESET;
 	printContainer(vec);
-	// PmergeMe pm;
-	// std::vector<int> inderstionOrder = pm.generateInsertionSequence(7);
-	// printContainer(inderstionOrder);
-	time = stopwatch(PmergeMe::mergeInsertionSortVec, vec);
-	// pm.mergeInsertionSortVec(vec);
-	std::cout << std::fixed << std::setprecision(5) << "Time taken: " << time * 1000.0 << " ms" << std::endl;
 	std::cout << YEL << "After:  " << RESET;
+	time = stopwatch(PmergeMe::mergeInsertionSortVec, vec);
+	std::cout << std::fixed << std::setprecision(5) << "Time to process a range of "
+		<< size << " elements with std::vector<int> : "
+		<< time * 1000.0 << " ms" << std::endl;
 	printContainer(vec);
 	std::cout << "size is same? ";
 	if (vec.size() == size)

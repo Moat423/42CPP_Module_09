@@ -103,7 +103,7 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::mergeInsertElements(
 std::vector<PmergeMe::ElementInfo>	PmergeMe::fordJohnsonSort( std::vector<ElementInfo> &vec)
 {
 	std::vector<ElementInfo> elements = vec;
-	if (vec.size() <= 1)
+	if (elements.size() <= 1)
 	{
 		elements[0].previousIndex = elements[0].originalIndex;
 		elements[0].originalIndex = 0;
