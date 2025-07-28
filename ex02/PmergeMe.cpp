@@ -67,6 +67,8 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::mergeInsertElements(
 	if (pendChain.size() == 1)
 		return (mainChain);
 	size_t previousJacob = 0;
+	// std::vector<size_t> boundaries;
+	// boundaries.reserve(pendChain.size());
 	for (size_t jacobsIndex = 2; jacobsIndex < jacobsthalNumbers.size(); jacobsIndex++)
 	{
 		size_t currentJacob = (jacobsthalNumbers[jacobsIndex] - 1 ) < pendChain.size() - 1
@@ -76,8 +78,17 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::mergeInsertElements(
 			const ElementInfo& elemToInsert = pendChain[pendChainIndexToInsert];
 			// inserting an element from pendChain into mainChain. if pendChainIndexToInsert is out of bounds, it is a straggler
 			size_t bound = mainChain.size();
+			// boundaries.push_back(mainChain.size());
 			if (pendChainIndexToInsert < lookupSortedSequence.size())
 			{
+				std::cout << "Looking for bound for element: " << elemToInsert << std::endl;
+				std::cout << "Partner Element from mainChain: " << lookupSortedSequence[pendChainIndexToInsert] << std::endl;
+				std::cout << "pendChainIndexToInsert: " << pendChainIndexToInsert << std::endl;
+				// boundaries.back() = lookupSortedSequence[pendChainIndexToInsert].originalIndex;
+				// for (size_t boundaryIndex = 0; boundaryIndex < boundaries.size() - 1; boundaryIndex++)
+				// {
+				// 	boundaries.back() += 1 & (boundaries[boundaryIndex] < boundaries.back());
+				// }
 				// have to know at what point the elements to inserts partner is in main chain, so i only search up to that point.
 				// can make this better, by making vec of previous insertion points and adding them up to pendChainIndexToInsert if they are lower step by step
 				for (size_t k = 0; k < mainChain.size(); k++)
@@ -88,6 +99,14 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::mergeInsertElements(
 						break;
 					}
 				}
+				std::cout << "Element at upperBound in mainChain: " << mainChain[bound] << std::endl;
+				std::cout << "Bound index: " << bound << std::endl;
+				// std::cout << "Element at upperBound in mainChain: " << mainChain[boundaries.back()] << std::endl;
+				// std::cout << "Bound index: " << boundaries.back() << std::endl;
+			}
+			else
+			{
+				std::cout << "pendChainIndexToInsert is out of bounds for lookupSortedSequence because it is STRAGGLER, using mainChain size as bound" << std::endl;
 			}
 			//binary search within bounded range
 			std::vector<ElementInfo>::iterator insertionPoint = std::lower_bound(
@@ -100,17 +119,10 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::mergeInsertElements(
 	return (mainChain);
 }
 
-std::vector<PmergeMe::ElementInfo>	PmergeMe::fordJohnsonSort(const std::vector<ElementInfo> &vec)
+std::vector<PmergeMe::ElementInfo>	PmergeMe::pairAndExtract( std::vector<ElementInfo> &elements)
 {
-	std::vector<ElementInfo> elements = vec;
-	if (elements.size() <= 1)
-	{
-		elements[0].previousIndex = elements[0].originalIndex;
-		elements[0].originalIndex = 0;
-		return (elements);
-	}
-	// pair and extract ( larger is in odd position)
 	std::vector<ElementInfo> largerElements;
+	largerElements.reserve(elements.size() / 2 + 1);
 	size_t	elementsIndex = 0;
 	while (elementsIndex < elements.size() && elementsIndex + 1 < elements.size())
 	{
@@ -123,19 +135,31 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::fordJohnsonSort(const std::vector<E
 		largerElements.push_back(elements[elementsIndex + 1]);
 		elementsIndex += 2;
 	}
+	return largerElements;
+}
+
+std::vector<PmergeMe::ElementInfo>	PmergeMe::fordJohnsonSort(const std::vector<ElementInfo> &vec)
+{
+	std::vector<ElementInfo> elements = vec;
+	if (elements.size() <= 1)
+	{
+		elements[0].previousIndex = elements[0].originalIndex;
+		elements[0].originalIndex = 0;
+		return (elements);
+	}
+	std::vector<ElementInfo> largerElements = pairAndExtract(elements);
 	// take care of straggler, if one element can't be paired
 	ElementInfo	straggler;
 	bool		hasStraggler = (elements.size() % 2 == 1);
 	if (hasStraggler)
 	{
-		// set with marker sizemax to mark straggler inside chain
 		straggler.value = elements.back().value;
 		straggler.originalIndex = std::numeric_limits<size_t>::max();
 		straggler.previousIndex = elements.back().originalIndex;
 		elements.pop_back();
 	}
+	//recursively sort the larger elements
 	std::vector<ElementInfo> sortedLarger = fordJohnsonSort(largerElements);
-
 	std::vector<ElementInfo> pendChain;
 	pendChain.reserve(sortedLarger.size() + (1 & hasStraggler));
 	for (size_t i = 0; i < sortedLarger.size(); i++)
@@ -143,7 +167,7 @@ std::vector<PmergeMe::ElementInfo>	PmergeMe::fordJohnsonSort(const std::vector<E
 		sortedLarger[i] = (elements[sortedLarger[i].previousIndex]);
 		pendChain.push_back(elements[sortedLarger[i].originalIndex - 1]);
 	}
-	std::vector<size_t> jacobsthalNumbers = generateJacobsthalNumbers(pendChain.size() + 2);
+	const std::vector<size_t> jacobsthalNumbers = generateJacobsthalNumbers(pendChain.size() + 2);
 	// if straggler index is present in jacobsthal numbers, can insert it in regular mergeInsertElements, else do insertion at end
 	if (hasStraggler && pendChain.size() == jacobsthalNumbers.back() - 1)
 	{
