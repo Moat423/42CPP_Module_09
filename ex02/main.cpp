@@ -17,9 +17,11 @@ int main (int argc, char *argv[])
 	long				linput;
 	char				*endptr;
 	double				time;
+	double				timeDeq;
 	size_t				size;
 	std::vector<int>	vec;
 	std::deque<int>		deq;
+	PmergeMe::comparisonCount = 0;
 	for (int i = 1; argv[i] != NULL; i++)
 	{
 		linput = strtol(argv[i], &endptr, 10);
@@ -40,25 +42,25 @@ int main (int argc, char *argv[])
 	size = vec.size();
 	std::cout << YEL << "Before: " << RESET;
 	printContainer(vec);
+	time = stopwatch(PmergeMe::mergeInsertionSortVec, vec);
 	std::cout << YEL << "After:  " << RESET;
 	printContainer(vec);
-	time = stopwatch(PmergeMe::mergeInsertionSortVec, vec);
 	std::cout << std::fixed << std::setprecision(5) << "Time to process a range of "
 		<< size << " elements with std::vector<int> : "
 		<< time * 1000.0 << " ms" << std::endl;
-	// std::cout << "comparison count: " << PmergeMe::comparisonCount << std::endl;
-	// PmergeMe::comparisonCount = 0;
-	time = stopwatch(PmergeMe::mergeInsertionSortDeq, deq);
+	std::cout << "comparison count vector: " << PmergeMe::comparisonCount << std::endl;
+	PmergeMe::comparisonCount = 0;
+	timeDeq = stopwatch(PmergeMe::mergeInsertionSortDeq, deq);
 	std::cout << std::fixed << std::setprecision(5) << "Time to process a range of "
-		<< size << " elements with std::vector<int> : "
-		<< time * 1000.0 << " ms" << std::endl;
-	std::cout << "comparison count: " << PmergeMe::comparisonCount << std::endl;
+		<< size << " elements with std::deque<int> : "
+		<< timeDeq * 1000.0 << " ms" << std::endl;
+	std::cout << "comparison count deque: " << PmergeMe::comparisonCount << std::endl;
 	std::cout << "size is same? ";
 	if (vec.size() == size && deq.size() == size)
 		std::cout << GREEN << "yes" << RESET << std::endl;
 	else
 		std::cout << RED << "no" << RESET << std::endl;
-	std::cout << "is sorted: ";
+	std::cout << "both sorted: ";
 	if (is_sorted(vec.begin(), vec.end()) && is_sorted(deq.begin(), deq.end()))
 		std::cout << GREEN << "yes" << RESET << std::endl;
 	else
